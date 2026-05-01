@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global Distribution System Operators Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<style>
+:root{
+  --bg:#f5f0e8;--bg2:#eee8d8;--bg3:#fffdf8;--card:#fffdf8;
+  --el:#eee8d8;--hov:#e7dec8;
+  --border:rgba(26,22,18,.09);--border2:rgba(26,22,18,.20);
+  --bdhi:rgba(139,30,44,.30);
+  --amber:#8b1e2c;--amber2:#6b1520;
+  --blue:#3a70c8;--green:#2a7a4e;--red:#b83838;--purple:#6b6b78;--teal:#6494d8;--gray:#949498;
+  --adv:#2a7a4e;--est:#3a70c8;--dev:#6b6b78;--emg:#d45858;--nas:#b83838;
+  --text:#16120e;--text2:#52483e;--text3:#968b76;--text4:#c9bfa6;
+  --fs:'Fraunces',Georgia,serif;--fb:'Inter Tight',sans-serif;--fm:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:13px;min-height:100vh;overflow-x:hidden;}
+.z1{position:relative;z-index:1;}
+.container{max-width:1700px;margin:0 auto;padding:0 24px;}
+header{border-bottom:1px solid var(--border);padding:14px 0;background:var(--card);}
+.hdr{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.hdr-title h1{font-family:var(--fs);font-size:2rem;font-weight:700;letter-spacing:-.01em;color:var(--text);line-height:1.1;}
+.hdr-title p{font-family:var(--fm);font-size:.6rem;color:var(--text3);letter-spacing:.15em;text-transform:uppercase;margin-top:5px;}
+.hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.live-badge{font-family:var(--fm);font-size:.6rem;background:rgba(42,122,78,.07);border:1px solid rgba(42,122,78,.25);color:var(--green);padding:4px 12px;letter-spacing:.15em;border-radius:3px;display:flex;align-items:center;gap:6px;}
+.dot{width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(42,122,78,.30);}50%{opacity:.7;box-shadow:0 0 0 4px transparent;}}
+.hl-badge{font-family:var(--fm);font-size:.6rem;color:var(--text3);border:1px solid var(--border);background:var(--bg);padding:4px 12px;letter-spacing:.12em;border-radius:3px;}
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;padding:20px 0 14px;}
+.sc{background:var(--card);border:1px solid var(--border);padding:13px 16px;position:relative;overflow:hidden;border-radius:4px;box-shadow:0 1px 4px rgba(26,22,18,.06);}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.sc.a::before{background:var(--amber);}.sc.b::before{background:var(--blue);}
+.sc.g::before{background:var(--green);}.sc.r::before{background:var(--red);}
+.sc.p::before{background:var(--purple);}.sc.t::before{background:var(--teal);}
+.sc.gr::before{background:var(--gray);}
+.sn{font-family:var(--fm);font-size:1.6rem;font-weight:600;letter-spacing:.02em;line-height:1;}
+.sc.a .sn{color:var(--amber);}.sc.b .sn{color:var(--blue);}.sc.g .sn{color:var(--green);}
+.sc.r .sn{color:var(--red);}.sc.p .sn{color:var(--purple);}
+.sc.t .sn{color:var(--teal);}.sc.gr .sn{color:var(--gray);}
+.sl{font-family:var(--fm);font-size:.55rem;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;margin-top:5px;}
+.ss{font-family:var(--fm);font-size:.55rem;color:var(--text4);margin-top:2px;}
+/* REGIONAL */
+.reg-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:8px;padding-bottom:14px;}
+.reg-card{background:var(--card);border:1px solid var(--border);padding:11px 13px;text-align:center;border-radius:4px;}
+.reg-name{font-family:var(--fm);font-size:.55rem;color:var(--text3);letter-spacing:.13em;text-transform:uppercase;}
+.reg-num{font-family:var(--fm);font-size:1.5rem;font-weight:600;color:var(--amber);line-height:1;margin-top:2px;}
+.reg-sub{font-family:var(--fm);font-size:.5rem;color:var(--text4);margin-top:3px;line-height:1.5;}
+/* CHARTS */
+.charts{display:grid;grid-template-columns:1fr 1fr 2fr;gap:10px;padding-bottom:14px;}
+.cc{background:var(--card);border:1px solid var(--border);padding:16px 18px;border-radius:4px;box-shadow:0 1px 4px rgba(26,22,18,.06);}
+.ct{font-family:var(--fm);font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.ct::before{content:'';width:2px;height:9px;background:var(--amber);border-radius:1px;}
+.cw{position:relative;height:190px;}
+.clegend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.cl-item{display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:.58rem;color:var(--text2);}
+.cl-sq{width:8px;height:8px;border-radius:1px;flex-shrink:0;}
+/* SECTION HEADER */
+.sh{display:flex;align-items:center;gap:10px;padding:10px 0 8px;}
+.sh-line{flex:1;height:1px;background:var(--border);opacity:.7;}
+.sh-txt{font-family:var(--fm);font-size:.56rem;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;}
+/* MAP */
+.map-outer{background:var(--card);border:1px solid var(--border);overflow:hidden;position:relative;border-radius:4px;box-shadow:0 1px 4px rgba(26,22,18,.06);}
+.map-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--border);}
+.map-ctrl-label{font-family:var(--fm);font-size:.56rem;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;margin-right:4px;}
+.mode-btn{font-family:var(--fm);font-size:.56rem;background:var(--bg);border:1px solid var(--border);color:var(--text2);padding:4px 11px;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;border-radius:3px;transition:all .14s;}
+.mode-btn:hover{border-color:var(--bdhi);color:var(--amber);background:rgba(139,30,44,.03);}
+.mode-btn.active{background:rgba(139,30,44,.06);border-color:var(--bdhi);color:var(--amber);}
+.map-hint{font-family:var(--fm);font-size:.54rem;color:var(--text4);margin-left:auto;letter-spacing:.04em;}
+#mapSvg{display:block;width:100%;background:var(--bg);}
+.map-legend{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:8px 16px;border-top:1px solid var(--border);min-height:40px;}
+.ml-label{font-family:var(--fm);font-size:.55rem;color:var(--text3);letter-spacing:.13em;text-transform:uppercase;white-space:nowrap;}
+.ml-items{display:flex;gap:10px;flex-wrap:wrap;}
+.ml-item{display:flex;align-items:center;gap:4px;font-family:var(--fm);font-size:.56rem;color:var(--text2);}
+.ml-dot{width:10px;height:10px;border-radius:1px;flex-shrink:0;}
+.grad-legend{display:flex;align-items:center;gap:8px;}
+.grad-bar{width:100px;height:7px;border-radius:2px;}
+.grad-tick{font-family:var(--fm);font-size:.56rem;color:var(--text3);}
+/* TOOLTIP */
+.map-tooltip{position:fixed;background:var(--card);border:1px solid var(--border);pointer-events:none;padding:8px 12px;font-family:var(--fm);font-size:.58rem;color:var(--text);z-index:9999;min-width:150px;max-width:240px;line-height:1.55;opacity:0;transition:opacity .1s;border-radius:4px;box-shadow:0 4px 12px rgba(26,22,18,.12);}
+.mtt-name{font-family:var(--fs);font-size:.78rem;font-weight:700;color:var(--amber);margin-bottom:3px;}
+/* COUNTRY PANEL */
+.country-panel{position:absolute;top:0;right:0;bottom:0;width:340px;background:var(--card);border-left:1px solid var(--border);overflow-y:auto;transform:translateX(100%);transition:transform .25s;z-index:100;box-shadow:-4px 0 16px rgba(26,22,18,.12);}
+.country-panel.open{transform:translateX(0);}
+.cp-header{padding:13px 15px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.cp-name{font-family:var(--fs);font-size:1.3rem;font-weight:700;letter-spacing:-.01em;color:var(--text);line-height:1.1;}
+.cp-region{font-family:var(--fm);font-size:.55rem;color:var(--amber);letter-spacing:.14em;text-transform:uppercase;margin-top:3px;}
+.cp-close{background:var(--bg);border:1px solid var(--border);color:var(--text3);font-size:.6rem;padding:3px 8px;cursor:pointer;font-family:var(--fm);border-radius:3px;transition:all .14s;flex-shrink:0;}
+.cp-close:hover{border-color:rgba(184,56,56,.4);color:var(--red);}
+.cp-body{padding:13px 15px;}
+.cp-row{margin-bottom:11px;}
+.cp-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px;}
+.cp-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:11px;}
+.cp-label{font-family:var(--fm);font-size:.53rem;color:var(--text3);letter-spacing:.13em;text-transform:uppercase;margin-bottom:3px;}
+.cp-val{font-family:var(--fm);font-size:.66rem;color:var(--text2);line-height:1.45;}
+.cp-val-big{font-family:var(--fm);font-size:1.1rem;font-weight:600;line-height:1;margin-top:2px;}
+.cp-company{font-family:var(--fm);font-size:.6rem;color:var(--text2);line-height:1.45;}
+.cp-divider{height:1px;background:var(--border);margin:9px 0;opacity:.7;}
+/* METRIC BAR */
+.metric-bar{margin-top:5px;}
+.m-track{height:5px;background:var(--el);border-radius:3px;overflow:hidden;}
+.m-fill{height:100%;border-radius:3px;transition:width .4s;}
+.m-val{font-family:var(--fm);font-size:.62rem;font-weight:600;margin-top:3px;}
+/* SAIDI display */
+.saidi-pill{display:inline-block;padding:3px 9px;border-radius:3px;font-family:var(--fm);font-size:.7rem;font-weight:600;letter-spacing:.05em;}
+/* FREQ PILLS */
+.freq-pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:3px;font-family:var(--fm);font-size:.72rem;font-weight:600;letter-spacing:.06em;}
+.freq-50{background:rgba(58,112,200,.08);color:#3a70c8;border:1px solid rgba(58,112,200,.28);}
+.freq-60{background:rgba(42,122,78,.08);color:#2a7a4e;border:1px solid rgba(42,122,78,.28);}
+.freq-mix{background:rgba(107,107,120,.08);color:#6b6b78;border:1px solid rgba(107,107,120,.28);}
+/* BADGES */
+.badge{display:inline-block;padding:2px 7px;font-size:.55rem;letter-spacing:.06em;font-weight:600;text-transform:uppercase;white-space:nowrap;border-radius:3px;font-family:var(--fm);}
+.bu{background:rgba(42,122,78,.08);color:#2a7a4e;border:1px solid rgba(42,122,78,.25);}
+.bvi{background:rgba(184,56,56,.08);color:#b83838;border:1px solid rgba(184,56,56,.25);}
+.bm{background:rgba(58,112,200,.08);color:#3a70c8;border:1px solid rgba(58,112,200,.25);}
+.bpub{background:rgba(58,112,200,.08);color:#3a70c8;border:1px solid rgba(58,112,200,.25);}
+.bprv{background:rgba(107,107,120,.08);color:#6b6b78;border:1px solid rgba(107,107,120,.25);}
+.bmix{background:rgba(100,148,216,.08);color:#6494d8;border:1px solid rgba(100,148,216,.25);}
+.bf50{background:rgba(58,112,200,.07);color:#3a70c8;border:1px solid rgba(58,112,200,.22);font-size:.54rem;}
+.bf60{background:rgba(42,122,78,.07);color:#2a7a4e;border:1px solid rgba(42,122,78,.22);font-size:.54rem;}
+.bfmix{background:rgba(107,107,120,.07);color:#6b6b78;border:1px solid rgba(107,107,120,.22);font-size:.54rem;}
+/* MINI BARS */
+.re-small-wrap{display:flex;align-items:center;gap:6px;}
+.re-small-track{flex:1;height:3px;background:var(--el);border-radius:2px;overflow:hidden;}
+.re-small-fill{height:100%;border-radius:2px;}
+.re-small-pct{font-family:var(--fm);font-size:.62rem;color:var(--text2);min-width:32px;text-align:right;}
+/* FILTERS */
+.filters{background:var(--card);border:1px solid var(--border);padding:10px 16px;display:flex;gap:11px;flex-wrap:wrap;align-items:center;margin-bottom:10px;border-radius:4px;}
+.fg{display:flex;align-items:center;gap:6px;}
+.fl{font-family:var(--fm);font-size:.54rem;color:var(--text3);letter-spacing:.13em;text-transform:uppercase;white-space:nowrap;}
+select,input[type=text]{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--fm);font-size:.68rem;padding:5px 9px;outline:none;cursor:pointer;border-radius:3px;transition:border-color .14s;}
+select:focus,input:focus{border-color:rgba(139,30,44,.35);}
+input[type=text]{min-width:160px;}
+.fsep{width:1px;height:20px;background:var(--border);margin:0 2px;}
+.rc{font-family:var(--fm);font-size:.58rem;color:var(--text3);margin-left:auto;}
+.rc span{color:var(--amber);font-weight:600;}
+.reset-btn{font-family:var(--fm);font-size:.56rem;background:var(--bg);border:1px solid var(--border);color:var(--text2);padding:4px 10px;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;border-radius:3px;transition:all .14s;}
+.reset-btn:hover{border-color:var(--bdhi);color:var(--amber);background:rgba(139,30,44,.03);}
+/* TABLE */
+.tw{background:var(--card);border:1px solid var(--border);overflow:auto;max-height:600px;margin-bottom:12px;border-radius:4px;box-shadow:0 1px 4px rgba(26,22,18,.06);}
+table{width:100%;border-collapse:collapse;font-family:var(--fm);font-size:.66rem;}
+thead th{background:var(--el);padding:7px 11px;text-align:left;font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);position:sticky;top:0;cursor:pointer;white-space:nowrap;user-select:none;transition:color .14s;z-index:5;font-weight:500;}
+thead th:hover{color:var(--amber);}
+thead th.sa{color:var(--amber);}thead th.sa::after{content:' ↑';}
+thead th.sd{color:var(--amber);}thead th.sd::after{content:' ↓';}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
+tbody tr:hover{background:var(--hov);}
+tbody td{padding:6px 11px;color:var(--text2);vertical-align:middle;}
+tbody td:first-child{color:var(--text);font-weight:600;}
+.bflag{font-size:.54rem;color:var(--text3);display:block;margin-top:1px;}
+.vol{font-size:.6rem;color:var(--text2);}
+.note-cell{font-size:.58rem;color:var(--text3);max-width:190px;line-height:1.4;}
+.no-data{text-align:center;padding:40px;color:var(--text3);font-family:var(--fs);font-size:.85rem;font-style:italic;}
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:14px 0;margin-top:4px;background:var(--card);}
+.fi{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.fp{font-family:var(--fm);font-size:.54rem;color:var(--text4);letter-spacing:.1em;font-style:italic;}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#c9bfa6;border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:var(--amber);}
+@media(max-width:1100px){.charts{grid-template-columns:1fr 1fr;}.charts .cc:last-child{grid-column:1/-1;}}
+@media(max-width:700px){.charts{grid-template-columns:1fr;}.charts .cc:last-child{grid-column:auto;}.hdr-title h1{font-size:1.7rem;}.country-panel{width:100%;}}
+</style>
+</head>
+<body>
+<header class="z1">
+<div class="container">
+  <div class="hdr">
+    <div class="hdr-title">
+      <h1><em style="font-style:italic;color:var(--amber)">⚡</em> Global Distribution System Operators</h1>
+      <p>Legal status · Ownership · Frequency · MV/LV voltages · Customers · Electrification rate · Smart meters · SAIDI · Distributed RE · End-2025 · ~147 Countries</p>
+    </div>
+    <div class="hdr-right">
+      <span class="live-badge"><span class="dot"></span>REFERENCE DATABASE</span>
+      <span class="hl-badge">~147 COUNTRIES</span>
+    </div>
+  </div>
+</div>
+</header>
+
+<div class="container z1">
+<div class="stats" id="statsRow"></div>
+<div class="sh"><div class="sh-line"></div><span class="sh-txt">Regional Overview</span><div class="sh-line"></div></div>
+<div class="reg-row" id="regRow"></div>
+<div class="sh"><div class="sh-line"></div><span class="sh-txt">Structural Analysis</span><div class="sh-line"></div></div>
+<div class="charts">
+  <div class="cc"><div class="ct">Legal Status</div><div class="cw"><canvas id="cStatus"></canvas></div><div class="clegend" id="legStatus"></div></div>
+  <div class="cc"><div class="ct">Ownership Type</div><div class="cw"><canvas id="cOwn"></canvas></div><div class="clegend" id="legOwn"></div></div>
+  <div class="cc"><div class="ct">Countries by Region — stacked by legal status</div><div class="cw" style="height:210px;"><canvas id="cRegion"></canvas></div></div>
+</div>
+
+<div class="sh"><div class="sh-line"></div><span class="sh-txt">Interactive World Map — Click Any Country For Full DSO Profile</span><div class="sh-line"></div></div>
+<div class="map-outer" id="mapOuter">
+  <div class="map-controls">
+    <span class="map-ctrl-label">Color by:</span>
+    <button class="mode-btn active" onclick="setMode('status')" id="btn-status">Legal Status</button>
+    <button class="mode-btn" onclick="setMode('ownership')" id="btn-ownership">Ownership</button>
+    <button class="mode-btn" onclick="setMode('freq')" id="btn-freq">Frequency</button>
+    <button class="mode-btn" onclick="setMode('electRate')" id="btn-electRate">Electrification</button>
+    <button class="mode-btn" onclick="setMode('smartMeter')" id="btn-smartMeter">Smart Meters</button>
+    <button class="mode-btn" onclick="setMode('saidi')" id="btn-saidi">Reliability (SAIDI)</button>
+    <button class="mode-btn" onclick="setMode('distRE')" id="btn-distRE">Distributed RE</button>
+    <span class="map-hint">CLICK COUNTRY FOR DETAILS · SCROLL TO ZOOM · DRAG TO PAN</span>
+  </div>
+  <svg id="mapSvg"></svg>
+  <div class="map-legend" id="mapLegend"></div>
+  <div class="country-panel" id="countryPanel">
+    <div class="cp-header">
+      <div><div class="cp-name" id="cpName">—</div><div class="cp-region" id="cpRegion">—</div></div>
+      <button class="cp-close" onclick="closePanel()">✕ CLOSE</button>
+    </div>
+    <div class="cp-body" id="cpBody"></div>
+  </div>
+</div>
+
+<div class="sh" style="margin-top:14px;"><div class="sh-line"></div><span class="sh-txt">Country Data Explorer</span><div class="sh-line"></div></div>
+<div class="filters">
+  <div class="fg"><span class="fl">Search</span><input type="text" id="searchInput" placeholder="Country or operator..."></div>
+  <div class="fsep"></div>
+  <div class="fg"><span class="fl">Region</span>
+    <select id="regFilter"><option value="">All</option><option>Africa</option><option>Asia</option><option>Europe</option><option>North America</option><option>South America</option><option>Oceania</option></select>
+  </div>
+  <div class="fg"><span class="fl">Legal Status</span>
+    <select id="statFilter"><option value="">All</option><option value="Unbundled">Unbundled</option><option value="Vertically Integrated">Vertically Integrated</option><option value="Mixed">Mixed</option></select>
+  </div>
+  <div class="fg"><span class="fl">Ownership</span>
+    <select id="ownFilter"><option value="">All</option><option>Public</option><option>Private</option><option>Mixed</option></select>
+  </div>
+  <div class="fg"><span class="fl">Frequency</span>
+    <select id="freqFilter"><option value="">All</option><option value="50 Hz">50 Hz</option><option value="60 Hz">60 Hz</option><option value="50/60 Hz">50/60 Hz</option></select>
+  </div>
+  <button class="reset-btn" onclick="resetFilters()">RESET</button>
+  <span class="rc">Showing <span id="rcN">0</span> of <span id="rcT">0</span></span>
+</div>
+<div class="tw"><table>
+  <thead><tr>
+    <th onclick="sortBy('country')" id="th-country">Country</th>
+    <th onclick="sortBy('region')" id="th-region">Region</th>
+    <th onclick="sortBy('numDSOs')" id="th-numDSOs"># DSOs</th>
+    <th>Main Operator(s)</th>
+    <th onclick="sortBy('status')" id="th-status">Legal Status</th>
+    <th onclick="sortBy('ownership')" id="th-ownership">Ownership</th>
+    <th onclick="sortBy('freq')" id="th-freq">Freq.</th>
+    <th>MV / LV</th>
+    <th onclick="sortBy('customers')" id="th-customers">Customers (M)</th>
+    <th onclick="sortBy('electRate')" id="th-electRate">Electrif. %</th>
+    <th onclick="sortBy('smartMeter')" id="th-smartMeter">Smart Meters %</th>
+    <th onclick="sortBy('saidi')" id="th-saidi">SAIDI (hrs/yr)</th>
+    <th onclick="sortBy('distRE')" id="th-distRE">Dist. RE %</th>
+    <th>Notes</th>
+  </tr></thead>
+  <tbody id="tbody"></tbody>
+</table>
+<div class="no-data" id="noData" style="display:none">No records match the selected filters</div>
+</div>
+</div>
+
+<footer class="z1">
+<div class="container">
+<div class="fi">
+  <span class="fp">SOURCES: CEER (EU DSO benchmarks) · IRENA 2026 · IEA Electricity Security 2025 · World Bank Global Electrification Database 2025 · OECD DAC · Ember · National Regulators (OFGEM, BNetzA, ANEEL, NEPRA, NERC, ERCOT) · Utility Annual Reports 2024/25</span>
+  <span class="fp">DATA UPDATED TO END-2025 · SAIDI = System Average Interruption Duration Index (lower = better) · APPROXIMATE VALUES — RESEARCH PURPOSES ONLY</span>
+</div>
+</div>
+</footer>
+<div class="map-tooltip" id="mapTooltip"></div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+const DATA=[
+{country:"Algeria",region:"Africa",isoId:12,numDSOs:5,company:"SDC (Sonelgaz Distribution Centre), five regional subsidiaries: SDC Alger, SDC Est, SDC Ouest, SDC Centre, SDC Sud",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"30 / 10 kV",lvVolt:"400/230 V",customers:5.2,electRate:99,smartMeter:8,saidi:15.0,distRE:3,notes:"5 regional SDC subsidiaries of Sonelgaz; legal unbundling 2002; smart meter pilot Algiers 2024; 30 kV rural MV backbone."},
+{country:"Angola",region:"Africa",isoId:24,numDSOs:3,company:"ENDE Distribuidora (3 regional utilities: Luanda, Norte, Sul)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"30 / 15 kV",lvVolt:"400/230 V",customers:2.4,electRate:47,smartMeter:2,saidi:2200.0,distRE:5,notes:"Fragmented into 3 isolated regions; severe losses >30%; electrification drive via PNEE programme."},
+{country:"Benin",region:"Africa",isoId:204,numDSOs:1,company:"SBEE (Soci\u00e9t\u00e9 B\u00e9ninoise d'\u00c9nergie \u00c9lectrique)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"20 / 15 kV",lvVolt:"400/230 V",customers:0.7,electRate:45,smartMeter:1,saidi:1500.0,distRE:8,notes:"WAPP member; distribution losses ~30%; rural electrification via mini-grids growing."},
+{country:"Botswana",region:"Africa",isoId:72,numDSOs:1,company:"BPC (Botswana Power Corporation)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:0.6,electRate:72,smartMeter:12,saidi:25.0,distRE:7,notes:"SAPP member; urban 11 kV / rural 33 kV; smart meter trial Gaborone 2023."},
+{country:"Burkina Faso",region:"Africa",isoId:854,numDSOs:1,company:"SONABEL (Soci\u00e9t\u00e9 Nationale d'\u00c9lectricit\u00e9 du Burkina)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 20 kV",lvVolt:"400/230 V",customers:0.8,electRate:22,smartMeter:3,saidi:3000.0,distRE:18,notes:"Very low electrification; Zagtouli solar 33 MW feeds Ouagadougou; rural mini-grids funded by EU."},
+{country:"Cameroon",region:"Africa",isoId:120,numDSOs:1,company:"ENEO Cameroon S.A.",status:"Vertically Integrated",ownership:"Private",freq:"50 Hz",mvVolt:"30 / 15 kV",lvVolt:"400/230 V",customers:1.5,electRate:62,smartMeter:5,saidi:800.0,distRE:3,notes:"ACTIS/British CDC group concession; Nachtigal HPP 420 MW feeding distribution via 225 kV line."},
+{country:"C\u00f4te d'Ivoire",region:"Africa",isoId:384,numDSOs:1,company:"CIE (Compagnie Ivoirienne d'Electricit\u00e9, subsidiary EDF)",status:"Mixed",ownership:"Mixed",freq:"50 Hz",mvVolt:"33 / 15 kV",lvVolt:"400/230 V",customers:2.0,electRate:70,smartMeter:10,saidi:500.0,distRE:6,notes:"CIE (EDF 56%) operates under 20-yr concession from CI-ENERGIES; improving reliability in Abidjan."},
+{country:"DR Congo",region:"Africa",isoId:180,numDSOs:2,company:"SNEL (Kinshasa + Katanga isolated grids); off-grid providers for interior",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"15 / 6.6 kV",lvVolt:"380/220 V",customers:0.8,electRate:19,smartMeter:0,saidi:6000.0,distRE:2,notes:"Grid limited to Kinshasa, Katanga mining belt; ~19% electrification; massive off-grid solar opportunity."},
+{country:"Egypt",region:"Africa",isoId:818,numDSOs:8,company:"8 regional DISCOs: Cairo, Delta, Middle Egypt, Upper Egypt, Alexandria, Canal, East Delta, South Cairo",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:11.0,electRate:100,smartMeter:25,saidi:10.0,distRE:10,notes:"8 distribution companies under MOEE; smart meter rollout (phase 1 complete 2025); reliable urban networks; losses ~12%."},
+{country:"Ethiopia",region:"Africa",isoId:231,numDSOs:1,company:"EEDL (Ethiopian Electric Distribution and Logistics, formerly EEPCO distribution arm)",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 15 kV",lvVolt:"400/230 V",customers:5.0,electRate:55,smartMeter:5,saidi:900.0,distRE:4,notes:"EEDL separated from EEP 2013; rapid rural electrification programme; GERD HPP output driving expansion."},
+{country:"Ghana",region:"Africa",isoId:288,numDSOs:2,company:"ECG (Electricity Company of Ghana, south) + NEDCo (Northern Electricity Distribution Company)",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:3.5,electRate:85,smartMeter:18,saidi:350.0,distRE:7,notes:"ECG south unbundled from GRIDCo 2006; NEDCo covers northern regions; losses ECG ~24% (improving); smart meter pilot ongoing."},
+{country:"Guinea",region:"Africa",isoId:324,numDSOs:1,company:"EDG (\u00c9lectricit\u00e9 de Guin\u00e9e)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"15 / 6.3 kV",lvVolt:"380/220 V",customers:0.4,electRate:45,smartMeter:1,saidi:4000.0,distRE:2,notes:"Conakry grid only; severe reliability issues; Souapiti 450 MW + Kaleta 240 MW feeding limited distribution."},
+{country:"Kenya",region:"Africa",isoId:404,numDSOs:1,company:"KPLC (Kenya Power & Lighting Company)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"415/240 V",customers:9.0,electRate:75,smartMeter:35,saidi:120.0,distRE:5,notes:"KPLC listed on NSE; state 50.1%; 9M+ customers; Last Mile Connectivity Program added 5M+ rural customers 2018\u201325; smart meters accelerating."},
+{country:"Libya",region:"Africa",isoId:434,numDSOs:1,company:"GECOL (General Electricity Company of Libya)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"30 / 11 kV",lvVolt:"400/230 V",customers:1.6,electRate:70,smartMeter:0,saidi:3000.0,distRE:2,notes:"Grid severely damaged by conflict; GECOL split politically between Tripoli and Tobruk governments; chronic outages 8\u201318 hrs/day."},
+{country:"Madagascar",region:"Africa",isoId:450,numDSOs:1,company:"JIRAMA (Jiro sy Rano Malagasy)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"20 / 5.5 kV",lvVolt:"380/220 V",customers:0.4,electRate:15,smartMeter:2,saidi:5000.0,distRE:10,notes:"~15% electrification; multiple isolated grids; diesel-heavy; EU and AFD funding solar mini-grids in 200+ communities."},
+{country:"Malawi",region:"Africa",isoId:454,numDSOs:1,company:"ESCOM (Electricity Supply Corp. of Malawi)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:0.7,electRate:14,smartMeter:5,saidi:2500.0,distRE:5,notes:"~14% electrification (very low); Tedzani + Kapichira hydro critical; drought years cause severe load shedding; losses ~25%."},
+{country:"Mali",region:"Africa",isoId:466,numDSOs:1,company:"EDM-SA (\u00c9nergie du Mali)",status:"Vertically Integrated",ownership:"Mixed",freq:"50 Hz",mvVolt:"30 / 15 kV",lvVolt:"380/220 V",customers:0.9,electRate:52,smartMeter:3,saidi:1800.0,distRE:14,notes:"State majority; Segou solar 33 MW + Bamako distribution expansion; losses >25%; security situation hampering rural expansion."},
+{country:"Morocco",region:"Africa",isoId:504,numDSOs:3,company:"ONEE (national) + LYDEC (Casablanca, private Suez-Engie) + REDAL (Rabat, private Veolia)",status:"Mixed",ownership:"Mixed",freq:"50 Hz",mvVolt:"22 / 5.5 kV",lvVolt:"400/230 V",customers:5.5,electRate:99.5,smartMeter:40,saidi:45.0,distRE:20,notes:"3-tier model: ONEE national, private concessionaires in Casablanca (LYDEC) and Rabat (REDAL); LYDEC one of best-run utilities in Africa; rural electrification >99%."},
+{country:"Mozambique",region:"Africa",isoId:508,numDSOs:1,company:"EDM (Electricidade de Mo\u00e7ambique)",status:"Vertically Integrated",ownership:"Mixed",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:1.5,electRate:30,smartMeter:8,saidi:1200.0,distRE:5,notes:"EDM state majority; HCB (Cahora Bassa) separate; losses ~30%; FUNAE promoting off-grid solar for rural areas."},
+{country:"Namibia",region:"Africa",isoId:516,numDSOs:5,company:"NamPower (bulk) + CENORED, NORED, ERONGO, ORED, CEB (5 regional distributors)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:0.4,electRate:55,smartMeter:15,saidi:180.0,distRE:12,notes:"NamPower bulk; 5 regional distributors (mix public/private); NORED (north) majority municipal; Hyphen green hydrogen driving RE ambition."},
+{country:"Niger",region:"Africa",isoId:562,numDSOs:1,company:"NIGELEC (Soci\u00e9t\u00e9 Nig\u00e9rienne d'Electricit\u00e9)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 15 kV",lvVolt:"380/220 V",customers:0.7,electRate:18,smartMeter:2,saidi:3500.0,distRE:9,notes:"Very low electrification; Niamey mostly grid-connected; rural areas on diesel; Kandadji HPP 130 MW under construction."},
+{country:"Nigeria",region:"Africa",isoId:566,numDSOs:11,company:"11 DISCOs privatised 2013: Eko, Ikeja, Ibadan, Aba, Benin, Enugu, Jos, Kano, Kaduna, Port Harcourt, Yola",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"415/240 V",customers:8.5,electRate:55,smartMeter:10,saidi:4800.0,distRE:5,notes:"11 DISCOs privatised 2013 under NERC. Massive under-investment; average Nigerian receives 6\u20138 hrs/day electricity; losses >35%; metering only ~40% of connections; reform stalled by tariff disputes."},
+{country:"Rwanda",region:"Africa",isoId:646,numDSOs:1,company:"EUCL (Energy Utility Corporation Ltd., REG subsidiary)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"15 / 6.6 kV",lvVolt:"400/230 V",customers:1.5,electRate:75,smartMeter:45,saidi:90.0,distRE:18,notes:"Africa's best electrification progress; ~75% electrification (target 100% by 2024\u2014slightly delayed); smart prepayment meters widely deployed; losses ~14%."},
+{country:"Senegal",region:"Africa",isoId:686,numDSOs:1,company:"SENELEC (Soci\u00e9t\u00e9 Nationale d'Electricit\u00e9 du S\u00e9n\u00e9gal)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"30 / 6.6 kV",lvVolt:"380/220 V",customers:1.8,electRate:70,smartMeter:20,saidi:350.0,distRE:24,notes:"SENELEC state utility; ASER handles rural electrification; Taiba N'Diaye wind 158 MW + Ten Merina solar feeding distribution; losses ~20%."},
+{country:"South Africa",region:"Africa",isoId:710,numDSOs:4,company:"Eskom Distribution + 257 municipal licensees (incl. City Power Johannesburg, Ekurhuleni, Cape Town, eThekwini)",status:"Mixed",ownership:"Mixed",freq:"50 Hz",mvVolt:"33 / 22 / 11 kV",lvVolt:"400/230 V",customers:6.5,electRate:85,smartMeter:22,saidi:240.0,distRE:12,notes:"Eskom Distribution + 257 licensed municipal distributors; major reforms under SA Electricity Distribution Amendment Act; load shedding (Stage 1-8) 2022\u201324 severely impacted SAIDI; rooftop solar boom 2023\u201325."},
+{country:"Sudan",region:"Africa",isoId:729,numDSOs:2,company:"SEDC + SEDC-North (Sudan Electricity Distribution Company, 2 divisions)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:3.0,electRate:48,smartMeter:3,saidi:5000.0,distRE:5,notes:"Civil war since April 2023 severely disrupting distribution; Khartoum grid largely non-functional; rural areas on diesel/off-grid."},
+{country:"Tanzania",region:"Africa",isoId:834,numDSOs:1,company:"TANESCO (Tanzania Electric Supply Company)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"415/240 V",customers:2.5,electRate:38,smartMeter:15,saidi:1200.0,distRE:8,notes:"Julius Nyerere HPP 2.1 GW commissioned 2024; TANESCO distribution losses ~28%; rural electrification via REA (Rural Energy Agency); smart meters in Dar es Salaam."},
+{country:"Togo",region:"Africa",isoId:768,numDSOs:1,company:"CEET (Compagnie \u00c9nergie \u00c9lectrique du Togo)",status:"Vertically Integrated",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 5.5 kV",lvVolt:"380/220 V",customers:0.5,electRate:50,smartMeter:5,saidi:900.0,distRE:12,notes:"French EDF stake; CEET concession; WAPP CLSG 225 kV interconnection improved supply 2023; distribution losses ~22%."},
+{country:"Tunisia",region:"Africa",isoId:788,numDSOs:1,company:"STEG (Soci\u00e9t\u00e9 Tunisienne de l'\u00c9lectricit\u00e9 et du Gaz)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"30 / 15 kV",lvVolt:"400/230 V",customers:4.0,electRate:100,smartMeter:30,saidi:65.0,distRE:10,notes:"STEG serves all 10M Tunisian customers; technically one of Africa's best-run utilities; smart meter rollout 30%; solar self-consumption growing post-2022 law."},
+{country:"Uganda",region:"Africa",isoId:800,numDSOs:1,company:"UEDCL (Uganda Electricity Distribution Co. Ltd.) + private operators (Umeme Ltd. concession expired 2025; transition underway)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"415/240 V",customers:2.0,electRate:41,smartMeter:25,saidi:700.0,distRE:6,notes:"Umeme Ltd. (listed) 20-yr distribution concession expired March 2025; UEDCL taking over operations; Karuma HPP 600 MW feeding expanding distribution. Losses ~19%."},
+{country:"Zambia",region:"Africa",isoId:894,numDSOs:1,company:"ZESCO Distribution (ZESCO Ltd.)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:0.8,electRate:44,smartMeter:10,saidi:900.0,distRE:3,notes:"ZESCO distribution arm; drought severely hits Kariba HPP; load shedding 8\u201318 hrs/day in drought years; rural electrification via REA and mini-grid programmes."},
+{country:"Zimbabwe",region:"Africa",isoId:716,numDSOs:1,company:"ZETDC (Zimbabwe Electricity Transmission and Distribution Company, ZESA subsidiary)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:1.4,electRate:48,smartMeter:5,saidi:3000.0,distRE:6,notes:"ZETDC handles both T&D; severe under-investment; 50\u201380% losses in some feeders; Hwange 7&8 coal addition partially easing generation shortfall."},
+{country:"Albania",region:"Europe",isoId:8,numDSOs:1,company:"OSHEE (Operatori i Shp\u00ebrndarjes s\u00eb Energjis\u00eb Elektrike)",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:1.0,electRate:100,smartMeter:70,saidi:8.0,distRE:8,notes:"OSHEE privatised 2009 (CEZ, now Voltalia); losses from 40% (2013) \u2192 18% (2025); AMI rollout accelerating; ENTSO-E aligned."},
+{country:"Austria",region:"Europe",isoId:40,numDSOs:130,company:"~130 DSOs; main: Wiener Netze (Vienna), Netz O\u00d6, TINETZ-Tiroler Netze, Netz Burgenland, e-Netze Steiermark",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"30 / 10 kV",lvVolt:"400/230 V",customers:4.5,electRate:100,smartMeter:98,saidi:0.6,distRE:35,notes:"EU SAIDI benchmark leader; ~130 DSOs regulated by E-Control Austria; 98% smart meter penetration 2025; rooftop solar boom driving grid congestion in alpine regions."},
+{country:"Belarus",region:"Europe",isoId:112,numDSOs:6,company:"6 regional oblenergos: Minsk, Brest, Grodno, Gomel, Vitebsk, Mogilev (all BelEnergo subsidiaries)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:4.0,electRate:100,smartMeter:35,saidi:3.5,distRE:5,notes:"6 regional utilities under BelEnergo; Soviet-era distribution structure; smart meter rollout accelerating; Ostrovets NPP baseload feeds distribution."},
+{country:"Belgium",region:"Europe",isoId:56,numDSOs:4,company:"Fluvius (Flanders+Brussels, merged 2019), RESA (Wallonia), AIEG, Gaselwest",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"15 / 11 kV",lvVolt:"400/230 V",customers:5.8,electRate:100,smartMeter:99,saidi:0.9,distRE:48,notes:"Fluvius formed 2019 from merger of Eandis+Infrax; 99% smart meter penetration by 2025 (Flanders mandated 2023); Belgium 3rd EU in prosumer share."},
+{country:"Bosnia & Herzegovina",region:"Europe",isoId:70,numDSOs:3,company:"Elektroprivreda BiH (FBiH), Elektroprivreda HZHB (Herzeg-Bosnia), ERS (RS)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:1.1,electRate:100,smartMeter:25,saidi:5.5,distRE:5,notes:"3 vertically integrated utilities along ethnic/political lines; coal-heavy; EU accession process driving unbundling reforms."},
+{country:"Bulgaria",region:"Europe",isoId:100,numDSOs:3,company:"CEZ Electro Bulgaria (west), EVN Bulgaria (south-east), Electrohold (north, ex-EVN)",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:3.8,electRate:100,smartMeter:60,saidi:2.8,distRE:28,notes:"3 DSOs after privatisation waves; Electrohold (Bulgarian) acquired north from EVN 2020; Czech CEZ west; smart meters: CEZ 100%, EVN/Electrohold rolling out."},
+{country:"Croatia",region:"Europe",isoId:191,numDSOs:1,company:"HEP Operator Distribucijskog Sustava (HEP ODS)",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:2.2,electRate:100,smartMeter:55,saidi:2.1,distRE:22,notes:"HEP ODS dominant; several small island DSOs; smart meter rollout ongoing; rooftop solar growing rapidly post-EU membership 2013."},
+{country:"Czech Republic",region:"Europe",isoId:203,numDSOs:3,company:"\u010cEZ Distribuce (majority), E.ON Distribuce (south), PREdistribuce (Prague)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"22 / 10 kV",lvVolt:"400/230 V",customers:5.8,electRate:100,smartMeter:15,saidi:1.8,distRE:18,notes:"3 DSOs; \u010cEZ dominant (national grid); E.ON south Moravia+Bohemia; PRE Prague only. Slow smart meter rollout vs EU peers; SAIDI one of best in region."},
+{country:"Denmark",region:"Europe",isoId:208,numDSOs:55,company:"~55 DSOs; main: N1 (largest, private), Cerius (\u00d8rsted subsidiary), Radius, TREFOR El-net, Konstant Net",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"10 / 0.4 kV",lvVolt:"400/230 V",customers:3.3,electRate:100,smartMeter:100,saidi:0.25,distRE:72,notes:"~55 DSOs regulated by Forsyningstilsynet; 100% smart meters 2019 (world-first national completion); Denmark SAIDI world best; massive rooftop solar penetration; heat pump integration challenge."},
+{country:"Estonia",region:"Europe",isoId:233,numDSOs:2,company:"Elektrilevi (Enefit, dominant) + Imatra Elekter (small, border area)",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:0.8,electRate:100,smartMeter:100,saidi:1.5,distRE:45,notes:"Elektrilevi (Enefit group) >95% market share; 100% smart meters 2023; HISTORIC: Baltic synchronization to ENTSO-E 8 Feb 2025; rooftop solar accelerating."},
+{country:"Finland",region:"Europe",isoId:246,numDSOs:77,company:"~77 DSOs; main: Elenia (private, largest), Caruna (private), Helen (Helsinki), Turku Energia, LE-S\u00e4hk\u00f6verkko",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:3.8,electRate:100,smartMeter:100,saidi:2.8,distRE:38,notes:"~77 DSOs; Elenia (US funds) and Caruna (infrastructure investors) dominate; 100% smart meters 2013 (pioneered EU AMI); storm resilience investment post-2011 Tapani/Hannu storms."},
+{country:"France",region:"Europe",isoId:250,numDSOs:160,company:"Enedis (ex-ERDF, 95% of HV/MV customers) + ~160 local ENLs (Entreprises Locales de Distribution)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 15 kV",lvVolt:"400/230 V",customers:38.0,electRate:100,smartMeter:96,saidi:1.7,distRE:25,notes:"Enedis (EDF 100% subsidiary) covers 95% of mainland France; 160 smaller ENLs in some communes; Linky smart meter: 36M deployed by 2025 (96%); largest single DSO in Europe by customer count."},
+{country:"Germany",region:"Europe",isoId:276,numDSOs:880,company:"~880 DSOs; main: e.dis (E.ON), Bayernwerk Netz (E.ON/EDP), Westnetz (RWE), Netz Hamburg, SWM (Munich)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:51.0,electRate:100,smartMeter:18,saidi:0.37,distRE:58,notes:"~880 DSOs regulated by BNetzA; very low SAIDI 22 min/yr (world class); slowest EU smart meter rollout\u2014new rollout mandate from 2025; massive PV+battery+EV integration challenge; grid congestion acute."},
+{country:"Greece",region:"Europe",isoId:300,numDSOs:1,company:"HEDNO / DEDDIE (Hellenic Electricity Distribution Network Operator S.A., PPC subsidiary)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 15 kV",lvVolt:"400/230 V",customers:8.3,electRate:100,smartMeter:30,saidi:3.2,distRE:42,notes:"HEDNO (PPC/SGCC subsidiary); 30% smart meters rolling out; island grids (Aegean) often diesel\u2014solar+battery replacing; major RE hosting challenge."},
+{country:"Hungary",region:"Europe",isoId:348,numDSOs:6,company:"6 DSOs: E.ON (Budapest+centre), E.ON (D\u00e9l-Dun\u00e1nt\u00fal), E.ON (D\u00e9l-Alf\u00f6ld), E.ON (\u00c9szak-Alf\u00f6ld), E.ON (\u00c9szak-Magyarorsz\u00e1g), E.ON (Dun\u00e1nt\u00fal) \u2014 all now owned by MVM (state) after 2024 acquisition",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"22 / 10 kV",lvVolt:"400/230 V",customers:4.8,electRate:100,smartMeter:40,saidi:1.4,distRE:38,notes:"MVM (state) acquired all 6 E.ON distribution networks 2024\u2014renationalisation; smart meter rollout 40%; rapid rooftop solar boom creating grid congestion."},
+{country:"Iceland",region:"Europe",isoId:352,numDSOs:7,company:"7 DSOs; main: Reykjavik Energy (OR), Veitur (Landsvirkjun subsidiary), Nor\u00f0urorka",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"11 kV",lvVolt:"400/230 V",customers:0.2,electRate:100,smartMeter:100,saidi:0.5,distRE:3,notes:"7 utility-owned DSOs; geothermal+hydro near 100%; near-zero carbon distribution; excellent reliability; EV penetration highest in world per capita."},
+{country:"Ireland",region:"Europe",isoId:372,numDSOs:1,company:"ESB Networks (subsidiary ESB, state)",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"38 / 20 / 10 kV",lvVolt:"400/230 V",customers:2.4,electRate:100,smartMeter:85,saidi:1.8,distRE:52,notes:"ESB Networks covers 26-county Republic; smart meters 85% (rollout ongoing 2025); EV charging network integration; offshore wind grid hosting capacity being upgraded."},
+{country:"Italy",region:"Europe",isoId:380,numDSOs:120,company:"e-distribuzione (Enel, >85% market) + A2A Reti Elettriche, ACEA, Iride, Ireti, ~120 minor DSOs",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 15 kV",lvVolt:"400/230 V",customers:36.5,electRate:100,smartMeter:99.5,saidi:1.5,distRE:40,notes:"Enel e-distribuzione dominant; world first country to reach >99% smart meters (Telegestore 2001 \u2192 Contatore 2.0 by 2024); Italy leader EU in DSO-led AMI; rooftop solar + storage accelerating."},
+{country:"Kosovo",region:"Europe",isoId:383,numDSOs:1,company:"KEDS (Kosovo Electricity Distribution and Supply, Turkey's \u00c7al\u0131k Enerji)",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:0.6,electRate:100,smartMeter:45,saidi:8.2,distRE:5,notes:"KEDS privatised to \u00c7al\u0131k Enerji (Turkey) 2013; losses improved from 57% (2013) \u2192 32% (2025); smart meters 45%; ENTSO-E observer."},
+{country:"Latvia",region:"Europe",isoId:428,numDSOs:2,company:"Sadales t\u012bkls AS (dominant, Latvenergo subsidiary) + Latvijas G\u0101ze M\u0101jas (minor)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:1.1,electRate:100,smartMeter:98,saidi:2.2,distRE:20,notes:"Sadales t\u012bkls >99% market; 98% smart meters 2025; HISTORIC: synchronized ENTSO-E 8 Feb 2025; rooftop solar growing fast post-synchronization."},
+{country:"Lithuania",region:"Europe",isoId:440,numDSOs:1,company:"ESO (Energijos Skirstymo Operatorius, Ignitis group)",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:1.7,electRate:100,smartMeter:97,saidi:1.8,distRE:38,notes:"ESO (Ignitis Group, state) dominant; 97% smart meters 2025; HISTORIC: synchronized ENTSO-E 8 Feb 2025; wind+solar prosumers growing rapidly."},
+{country:"Luxembourg",region:"Europe",isoId:442,numDSOs:2,company:"Creos Luxembourg (dominant) + ENOVOS Enovos Distribution",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:0.35,electRate:100,smartMeter:88,saidi:0.8,distRE:20,notes:"Creos Luxembourg (Encevo group) dominant DSO; excellent reliability; smart meter 88%; LU has EU's highest electricity prices; EV and heat pump penetration rising."},
+{country:"Moldova",region:"Europe",isoId:498,numDSOs:3,company:"RED Nord (Gas Natural/Naturgy), RED Nord-Vest (Gas Natural), RED Union Fenosa (South, now Premier Energy)",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:1.1,electRate:100,smartMeter:35,saidi:10.0,distRE:8,notes:"3 private DSOs post-2000 reform; Transnistria is separate de facto state grid; Premier Energy (private) south; grid fragile, imports from Romania growing."},
+{country:"Montenegro",region:"Europe",isoId:499,numDSOs:1,company:"CEDIS (Crnogorsko Elektri\u010dno Distribucijsko Dru\u0161tvo, EPCG subsidiary)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"35 / 10 kV",lvVolt:"400/230 V",customers:0.3,electRate:100,smartMeter:30,saidi:6.8,distRE:20,notes:"CEDIS (EPCG group, Chinese state via CGES); losses ~22%; karst terrain makes cable laying expensive; solar growing."},
+{country:"Netherlands",region:"Europe",isoId:528,numDSOs:7,company:"7 DSOs: Liander (Alliander, largest), Stedin, Enexis, Coteq, DNWG, Westland Infra, Rendo",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:10.0,electRate:100,smartMeter:90,saidi:0.28,distRE:60,notes:"7 regional DSOs, all municipal/provincial ownership; SAIDI ~17 min (EU best class); massive grid congestion from solar+EV+heat pump\u2014Liander reported multi-year connection queues; 90% smart meters."},
+{country:"North Macedonia",region:"Europe",isoId:807,numDSOs:1,company:"EVN Macedonie (Elektrani na Severna Makedonija)",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:1.0,electRate:100,smartMeter:20,saidi:9.5,distRE:15,notes:"EVN (Austrian) privatised DSO; losses ~26% (improving); EU accession process driving reforms; solar growing in south."},
+{country:"Norway",region:"Europe",isoId:578,numDSOs:120,company:"~120 DSOs; main: Elvia (Hafslund, dominant Oslo region), Tensio, Glitre Energi, L-nett",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"22 / 11 kV",lvVolt:"400/230 V",customers:3.3,electRate:100,smartMeter:100,saidi:1.8,distRE:10,notes:"~120 DSOs mostly municipal-owned; 100% smart meters 2019; Norway highest EV penetration globally\u2014grid impact on LV networks acute; hydro dominated so local RE minor."},
+{country:"Poland",region:"Europe",isoId:616,numDSOs:5,company:"5 major DSOs: Tauron Dystrybucja, Energa-Operator, PGE Dystrybucja, E.ON (Stoen), Enea Operator",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"15 / 10 kV",lvVolt:"400/230 V",customers:17.0,electRate:100,smartMeter:30,saidi:3.2,distRE:30,notes:"5 vertically-separated DSOs owned by state energy groups (PGE, Tauron, Energa/PKN Orlen, Enea); smart meter rollout sluggish; prosumer solar boom creating reverse power flows; losses ~6%."},
+{country:"Portugal",region:"Europe",isoId:620,numDSOs:3,company:"E-Redes (EDP subsidiary, dominant) + EDA (A\u00e7ores) + EEM (Madeira)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"15 / 6 kV",lvVolt:"400/230 V",customers:6.4,electRate:100,smartMeter:92,saidi:1.4,distRE:42,notes:"E-Redes (EDP, SGCC 25% ultimate) dominant mainland; EDA island grids (A\u00e7ores) + EEM (Madeira) separate; 92% smart meters 2025; rooftop solar booming; EV penetration top 5 EU."},
+{country:"Romania",region:"Europe",isoId:642,numDSOs:5,company:"5 DSOs: Electrica (3 subsidiaries), CEZ Romania, E.ON Romania (now Delgaz Grid)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:9.5,electRate:100,smartMeter:20,saidi:5.4,distRE:28,notes:"Electrica SA (state majority listed) operates 3 DSOs; CEZ and E.ON cover south+west; smart meter rollout slow; Romania PV standout 2025; distribution losses ~9%."},
+{country:"Russia",region:"Europe",isoId:643,numDSOs:80,company:"~80 DSOs; main: Rosseti subsidiaries: IDGC Moscow, Lenenergo (St.Petersburg), IDGC Centre, IDGC Urals, + regional companies",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:62.0,electRate:100,smartMeter:55,saidi:4.2,distRE:2,notes:"~80 distribution subsidiaries under Rosseti holding; gas+coal dominant; smart meter mandatory rollout from 2020 law; losses ~10%; infrastructure aged; Western sanctions limiting equipment imports."},
+{country:"Serbia",region:"Europe",isoId:688,numDSOs:5,company:"5 regional DISCOs under EPS (Elektroprivreda Srbije): Belgrade, Centar, Jug, Sever, Timok",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:3.8,electRate:100,smartMeter:28,saidi:5.8,distRE:12,notes:"5 EPS distribution subsidiaries; coal-heavy generation; smart meter rollout slow; EU accession process driving unbundling reforms; losses ~11%."},
+{country:"Slovakia",region:"Europe",isoId:703,numDSOs:3,company:"3 DSOs: Slovensk\u00e1 elektriza\u010dn\u00e1 prenosov\u00e1 s\u00fastava SEPS (TSO, separate) + ZSD (Stredoslovensk\u00e1, E.ON) + VSD (V\u00fdchodoslovensk\u00e1, E.ON) + ZSE (Z\u00e1padoslovensk\u00e1, E.ON)",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"22 / 10 kV",lvVolt:"400/230 V",customers:2.8,electRate:100,smartMeter:35,saidi:1.6,distRE:12,notes:"3 regional DSOs all owned by E.ON (German); good reliability; nuclear dominant generation (Mochovce); solar growing in southern lowlands."},
+{country:"Slovenia",region:"Europe",isoId:705,numDSOs:5,company:"5 regional DSOs: Elektro Ljubljana, Elektro Maribor, Elektro Celje, Elektro Gorenjska, Elektro Primorska",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:1.0,electRate:100,smartMeter:50,saidi:1.9,distRE:10,notes:"5 state-owned regional DSOs; Kr\u0161ko NPP provides stable baseload; smart meters 50%; prosumer solar growing; EV penetration rising."},
+{country:"Spain",region:"Europe",isoId:724,numDSOs:5,company:"5 major DSOs: Endesa Distribuci\u00f3n, Iberdrola (I-DE), Union Fenosa Distribuci\u00f3n (Naturgy), Viesgo, HC Energ\u00eda; ~350 minor operators",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"20 / 15 kV",lvVolt:"400/230 V",customers:29.0,electRate:100,smartMeter:99,saidi:0.85,distRE:48,notes:"5 major licensed DSOs + 350 minor; 99% smart meters 2019 mandate met; Spain EU SAIDI leader; massive solar self-consumption installations 2022\u201325; EV infrastructure expanding rapidly."},
+{country:"Sweden",region:"Europe",isoId:752,numDSOs:170,company:"~170 DSOs; main: Ellevio (largest, private), E.ON Sverige, Vattenfall Eldistribution, Skellefte\u00e5 Kraft, J\u00e4mtkraft",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:5.5,electRate:100,smartMeter:100,saidi:1.2,distRE:45,notes:"~170 DSOs; 100% smart meters by 2003 (world-first national completion); Ellevio (infrastructure funds) and E.ON private; Vattenfall public; massive grid upgrade needed for northern wind+south EV/industry demand."},
+{country:"Switzerland",region:"Europe",isoId:756,numDSOs:680,company:"~680 DSOs; main: EWZ (Zurich), BKW Energie, Axpo Solutions, CKW, Energie Wasser Bern",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"16 / 10 kV",lvVolt:"400/230 V",customers:4.5,electRate:100,smartMeter:22,saidi:0.45,distRE:12,notes:"~680 DSOs mostly municipal-cantonal; excellent SAIDI ~27 min; slow smart meter: VESE voluntary vs mandatory elsewhere in EU; hydro+nuclear dominant; solar growing in Alpine+Jura."},
+{country:"T\u00fcrkiye",region:"Europe",isoId:792,numDSOs:21,company:"21 regional DISCOs: BEDA\u015e (Istanbul, largest, ENERJISA), AYEDA\u015e (Asian Istanbul), TEDA\u015e subsidiaries across Anatolia",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"34.5 / 10.5 kV",lvVolt:"400/230 V",customers:47.0,electRate:100,smartMeter:65,saidi:3.6,distRE:28,notes:"21 DISCOs after privatisation wave 2013\u201315; BEDA\u015e (Istanbul 11M customers) + AYEDA\u015e privatised to ENERJISA (Sabanc\u0131/E.ON); 65% smart meters 2025; YEKA auctions driving distributed RE."},
+{country:"Ukraine",region:"Europe",isoId:804,numDSOs:24,company:"24 regional oblenergos (oblastenergos); main: DTEK Dnipro, DTEK Kyiv, DTEK Odessa (private DTEK group) + state-owned oblenergo companies",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:15.0,electRate:100,smartMeter:25,saidi:45.0,distRE:8,notes:"24 regional oblenergo DSOs; ~7 owned by DTEK (Akhmetov group); war damage: missile strikes on substations and lines severely increased SAIDI; emergency repairs ongoing 2024\u201325."},
+{country:"United Kingdom",region:"Europe",isoId:826,numDSOs:14,company:"14 licensed DNOs: UK Power Networks (SSE+EDF subsidiary), Western Power Distribution (National Grid), Electricity North West, Northern Powergrid, SP Distribution, SSEN, NIE Networks",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:33.0,electRate:100,smartMeter:62,saidi:0.75,distRE:50,notes:"14 licensed DNOs regulated by Ofgem under RIIO-ED2 (2023\u201328); NESO (state) is system operator but DNOs remain private; 62% smart meter penetration (slower than targets); massive EV+heat pump grid impact coming."},
+{country:"Afghanistan",region:"Asia",isoId:4,numDSOs:4,company:"DABS regional offices (Kabul, North, West, South zones)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"380/220 V",customers:1.2,electRate:97,smartMeter:2,saidi:4000.0,distRE:10,notes:"DABS operates distribution; high electrification rate due to mobile connectivity but only ~30% from national grid; imports from neighbours dominate; reliability extremely poor."},
+{country:"Armenia",region:"Asia",isoId:51,numDSOs:1,company:"Electric Networks of Armenia (ENA, TPAO/Inter RAO subsidiary)",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:1.0,electRate:100,smartMeter:60,saidi:3.2,distRE:8,notes:"ENA (Russian Inter RAO 100%) dominant; losses improved 38% \u2192 12%; 60% smart meters; Masrik-1 solar 55 MW feeding distribution."},
+{country:"Azerbaijan",region:"Asia",isoId:31,numDSOs:1,company:"Azerenerji Distribution + Bakcell subsidiaries",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"380/220 V",customers:3.0,electRate:100,smartMeter:80,saidi:2.8,distRE:8,notes:"Azerenerji integrated; AMI rollout fast (80%); Baku grid modern; Nakhchivan separate and isolated; solar+wind feed distribution from 2024."},
+{country:"Bangladesh",region:"Asia",isoId:50,numDSOs:8,company:"DPDC (Dhaka urban), DESCO (Dhaka north), BREB (rural 80+ regions), PBSs (Palli Bidyut Samity, rural co-ops), WZPDCo, NWPDC, NESCO, WZPDCO",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:28.0,electRate:99,smartMeter:5,saidi:350.0,distRE:8,notes:"BREB (rural co-operatives) covers 80%+ of rural population\u2014one of Asia's largest rural electrification successes; Dhaka has urban DISCOs; losses 9\u201311%; smart meter nascent; solar home systems 6M+ rural."},
+{country:"Cambodia",region:"Asia",isoId:116,numDSOs:5,company:"EDC (national capital) + 5 private concessionaires for provinces",status:"Vertically Integrated",ownership:"Mixed",freq:"50 Hz",mvVolt:"22 / 11 kV",lvVolt:"400/230 V",customers:3.0,electRate:90,smartMeter:5,saidi:600.0,distRE:6,notes:"EDC urban + private rural concessions; electrification rate rose from 40% (2015) \u2192 90% (2025); rural electric cooperatives growing; floating solar Kamchay reservoir 2024."},
+{country:"China",region:"Asia",isoId:156,numDSOs:2,company:"State Grid Corporation Distribution (32 provincial subsidiaries) + China Southern Power Grid Distribution (5 provinces: Guangdong, Guangxi, Yunnan, Guizhou, Hainan)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"380/220 V",customers:600.0,electRate:100,smartMeter:100,saidi:2.8,distRE:47,notes:"2 SOEs dominate; State Grid serves 26 provinces+Tibet; China Southern 5 provinces; 100% smart meter penetration (AMI complete 2020); world's largest distribution network by customers; massive EV+distributed solar integration challenge."},
+{country:"Georgia",region:"Asia",isoId:268,numDSOs:2,company:"Telasi (Tbilisi, Georgian-American Energy subsidiary) + Energo-Pro Georgia (other regions)",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:1.4,electRate:100,smartMeter:55,saidi:6.0,distRE:7,notes:"Telasi (GGE group, Tbilisi) + Energo-Pro Georgia (Czech, rest of country); losses improved 40% \u2192 14%; hydro-dominant; smart meters 55%."},
+{country:"India",region:"Asia",isoId:356,numDSOs:70,company:"~70 state DISCOMs: TPDDL, BSES (Delhi), MSEDCL (Maharashtra), BESCOM (Karnataka), TNEB (Tamil Nadu), CESC (Kolkata), WBSEDCL, UP DISCOMs, Bihar DISCOMs + others",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"33 / 22 / 11 kV",lvVolt:"415/240 V",customers:310.0,electRate:100,smartMeter:20,saidi:35.0,distRE:32,notes:"~70 state DISCOMs; RDSS scheme 2021\u201326 deploying 250M smart prepay meters; losses vary 10% (Tata/BSES) to 45% (UP/Bihar); SAIDI improving but huge rural-urban divide; rooftop solar booming."},
+{country:"Indonesia",region:"Asia",isoId:360,numDSOs:1,company:"PLN (PT Perusahaan Listrik Negara) \u2014 22 regional distribution areas",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"20 kV",lvVolt:"400/230 V",customers:85.0,electRate:99,smartMeter:12,saidi:200.0,distRE:6,notes:"PLN single state utility covering archipelago; 22 regional distribution areas; Java-Bali grid world's 4th largest isolated grid; outer islands on diesel mini-grids; smart meter rollout accelerating 2024\u201325."},
+{country:"Iran",region:"Asia",isoId:364,numDSOs:39,company:"39 regional distribution companies under Tavanir (Ministry of Energy holding)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"20 / 11 kV",lvVolt:"400/230 V",customers:35.0,electRate:99,smartMeter:30,saidi:12.0,distRE:9,notes:"39 regional DISCOs under Tavanir; losses ~15%; smart meter 30%; chronic summer peak shortfalls from A/C; rooftop solar growing but constrained by subsidy policy."},
+{country:"Iraq",region:"Asia",isoId:368,numDSOs:18,company:"18 provincial distribution directorates under MOEE",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:8.0,electRate:88,smartMeter:3,saidi:3500.0,distRE:6,notes:"18 provincial DISCOs; widespread private generator dependency (12\u201318 hrs/day grid supply); losses 40%+; Al-Zubair solar 750 MW under construction; smart metering nascent."},
+{country:"Israel",region:"Asia",isoId:376,numDSOs:1,company:"IEC (Israel Electric Corporation Distribution Division)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"22 / 12.6 kV",lvVolt:"400/230 V",customers:3.5,electRate:100,smartMeter:95,saidi:0.8,distRE:30,notes:"IEC distribution monopoly; 95% smart meters (AMI programme); excellent reliability; massive rooftop solar + storage boom 2023\u201325; military security considerations affect some grid decisions."},
+{country:"Japan",region:"Asia",isoId:392,numDSOs:10,company:"10 regional utilities: TEPCO (Tokyo), Kansai, Chubu, Kyushu, Tohoku, Chugoku, Hokkaido, Shikoku, Hokuriku, J-Power (EPDC)",status:"Mixed",ownership:"Private",freq:"50/60 Hz",mvVolt:"6.6 kV",lvVolt:"200/100 V",customers:80.0,electRate:100,smartMeter:75,saidi:0.1,distRE:23,notes:"SAIDI world best: ~6 min/yr (Tokyo); 100V LV unique globally; 6.6 kV MV standard; 75% smart meters; 10 regional integrated utilities; post-Fukushima retail market opened 2016; solar+battery prosumers booming."},
+{country:"Jordan",region:"Asia",isoId:400,numDSOs:3,company:"JEPCO (Amman, largest) + IDECO (Irbid) + EDCO (south, Aqaba)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:1.8,electRate:99,smartMeter:35,saidi:8.0,distRE:36,notes:"3 licensed DISCOs; JEPCO privatised (IDECO listed); EDCO serves south including Aqaba free zone; smart meter rollout 35%; massive solar self-consumption growth."},
+{country:"Kazakhstan",region:"Asia",isoId:398,numDSOs:18,company:"~18 regional distribution companies; main: Almaty Energosbyt, Karaganda Zharyq, Sevkazenergo, PAVLODARENERGO",status:"Vertically Integrated",ownership:"Mixed",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:6.5,electRate:100,smartMeter:45,saidi:6.5,distRE:7,notes:"Regional distribution companies; Soviet-era infrastructure heavily aged; smart meter rollout 45%; coal dominant but southern RE growing; losses ~10%."},
+{country:"Kuwait",region:"Asia",isoId:414,numDSOs:1,company:"MEW (Ministry of Electricity & Water) Distribution Directorate",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"11 kV",lvVolt:"415/240 V",customers:1.0,electRate:100,smartMeter:55,saidi:1.5,distRE:5,notes:"MEW integrated ministry; electricity heavily subsidised (near-zero tariff); enormous peak A/C demand summer; smart meter 55%; Shagaya solar 70 MW + Al-Dibdibah 1.5 GW under development."},
+{country:"Kyrgyzstan",region:"Asia",isoId:417,numDSOs:4,company:"4 regional JSCs: Severelektro, Oshenergo, Jalalabatelektro, Vostokelektro",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"380/220 V",customers:1.5,electRate:99,smartMeter:20,saidi:25.0,distRE:3,notes:"4 regional distribution companies separated from Kyrgyzenergo; losses >30%; tariffs below cost-recovery; hydro-dominant (Toktogul); reform under World Bank pressure."},
+{country:"Laos",region:"Asia",isoId:418,numDSOs:1,company:"EDL-Gen + EDL Distribution (subsidiary)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"22 / 11 kV",lvVolt:"400/230 V",customers:1.5,electRate:98,smartMeter:10,saidi:500.0,distRE:6,notes:"EDL integrated; rural electrification 98% via national grid + off-grid; hydropower dominant; losses ~15%."},
+{country:"Lebanon",region:"Asia",isoId:422,numDSOs:1,company:"EDL (\u00c9lectricit\u00e9 du Liban) + private generators ubiquitous",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"20 / 15 kV",lvVolt:"400/230 V",customers:1.8,electRate:100,smartMeter:5,saidi:3500.0,distRE:6,notes:"EDL grid supplies only 2\u20138 hrs/day; remainder from private diesel generators; economic collapse 2019\u2013; solar+battery rapid self-supply growth; losses 40%+; privatisation plan unimplemented."},
+{country:"Malaysia",region:"Asia",isoId:458,numDSOs:3,company:"TNB Distribution (peninsula) + SESCO (Sarawak) + SESB (Sabah+Labuan)",status:"Vertically Integrated",ownership:"Mixed",freq:"50 Hz",mvVolt:"22 / 11 kV",lvVolt:"400/230 V",customers:10.0,electRate:99,smartMeter:35,saidi:0.68,distRE:7,notes:"TNB Peninsula dominant; SESCO (Sarawak public) + SESB (Sabah, TNB subsidiary); excellent SAIDI (41 min/yr); smart meter rollout ongoing; rooftop solar via NEM3.0."},
+{country:"Mongolia",region:"Asia",isoId:496,numDSOs:4,company:"4 regional DISCOs: Ulaanbaatar Electricity Distribution Network, Central, Eastern, Western",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"380/220 V",customers:0.7,electRate:88,smartMeter:30,saidi:25.0,distRE:15,notes:"Ulaanbaatar grid modern; rural ger areas increasingly electrified via solar panels; coal dominant; losses ~15%."},
+{country:"Myanmar",region:"Asia",isoId:104,numDSOs:2,company:"YESB (Yangon Electricity Supply Board) + MEPE Distribution",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:4.5,electRate:52,smartMeter:2,saidi:2000.0,distRE:5,notes:"Military governance since 2021; electrification progress halted; YESB Yangon only urban grid; rural off-grid; infrastructure degrading."},
+{country:"Nepal",region:"Asia",isoId:524,numDSOs:1,company:"NEA (Nepal Electricity Authority) Distribution + 7 private rural operators",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"415/240 V",customers:4.5,electRate:94,smartMeter:15,saidi:200.0,distRE:4,notes:"NEA integrated; distribution losses ~17%; load shedding eliminated by 2016 (historically 16 hrs/day); Upper Tamakoshi HPP 456 MW; India power trade growing; smart meter pilot."},
+{country:"North Korea",region:"Asia",isoId:408,numDSOs:1,company:"Ministry of Electric Power Industry regional bureaus",status:"Vertically Integrated",ownership:"Public",freq:"60 Hz",mvVolt:"6.6 kV",lvVolt:"220/110 V",customers:5.0,electRate:26,smartMeter:0,saidi:20000.0,distRE:5,notes:"Severe chronic shortage; ~26% electrification rate; Pyongyang has priority; rural areas near-zero supply; military priority on available power; no reliable data."},
+{country:"Oman",region:"Asia",isoId:512,numDSOs:4,company:"MEDC (Muscat, ACWA Power JV), MZEC (Mazoon, former Tanweer), RECO (Rural), DUWECO (Dhofar, isolated)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"415/240 V",customers:1.4,electRate:98,smartMeter:55,saidi:2.5,distRE:18,notes:"4 regional DISCOs; MEDC (Muscat+surrounds, ACWA Power); Dhofar isolated grid; smart meter 55%; Manah I+II solar 1 GW feeding distribution; Vision 2040 30% RE target."},
+{country:"Pakistan",region:"Asia",isoId:586,numDSOs:10,company:"10 DISCOs: LESCO (Lahore), IESCO (Islamabad), MEPCO (Multan), FESCO (Faisalabad), GEPCO, HESCO, SEPCO, PESCO, QESCO, TESCO",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"11 kV",lvVolt:"415/240 V",customers:37.0,electRate:72,smartMeter:8,saidi:2500.0,distRE:15,notes:"10 DISCOs under CPPA/NEPRA; circular debt crisis PKR 2.4 trillion; distribution losses 17\u201335% by DISCO; smart meter pilot Islamabad; load shedding 8\u201318 hrs/day in summer 2024; rural electrification challenge."},
+{country:"Philippines",region:"Asia",isoId:608,numDSOs:140,company:"~140 ECs (Electric Cooperatives) + private DUs: Meralco (Metro Manila, largest listed utility in SE Asia), VECO, CEBECO, SFELAPCO",status:"Unbundled",ownership:"Mixed",freq:"60 Hz",mvVolt:"13.8 / 6.9 kV",lvVolt:"240/120 V",customers:28.0,electRate:97,smartMeter:30,saidi:8.5,distRE:15,notes:"Meralco (Metro Manila, 7M customers) privately listed; ~140 rural electric cooperatives (ECs) under NEA; 60 Hz US legacy; Mindanao-Visayas energisation growing; solar+battery DER boom 2023\u201325."},
+{country:"Qatar",region:"Asia",isoId:634,numDSOs:1,company:"Kahramaa (Qatar General Electricity & Water Corporation)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"415/240 V",customers:0.7,electRate:100,smartMeter:85,saidi:0.6,distRE:10,notes:"Kahramaa integrated; excellent reliability; 85% smart meters; Al Kharsaah 800 MW solar feeding grid; LNG-rich country transitioning cautiously to RE."},
+{country:"Saudi Arabia",region:"Asia",isoId:682,numDSOs:1,company:"SEC (Saudi Electricity Company) Distribution",status:"Vertically Integrated",ownership:"Mixed",freq:"60 Hz",mvVolt:"13.8 / 7.2 kV",lvVolt:"127/220 V",customers:10.5,electRate:100,smartMeter:90,saidi:1.2,distRE:20,notes:"SEC distribution monopoly; 60 Hz from US 1950s; 127V LV unique in GCC (others 230V); 90% smart meters; Al Shuaibah solar 2.6 GW; massive A/C peak demand; Vision 2030 50% RE target driving DER integration."},
+{country:"Singapore",region:"Asia",isoId:702,numDSOs:1,company:"SP Group (Singapore Power, PowerGrid Distribution)",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"22 / 6.6 kV",lvVolt:"400/230 V",customers:1.5,electRate:100,smartMeter:100,saidi:0.07,distRE:9,notes:"World's best SAIDI (~4 min/yr); 100% AMI; Temasek-owned SP Group; city-state advantages; rooftop solar constrained by high-rise density; offshore solar on reservoir growing; retail market competitive."},
+{country:"South Korea",region:"Asia",isoId:410,numDSOs:1,company:"KEPCO (Korea Electric Power Corporation) Distribution Division",status:"Vertically Integrated",ownership:"Public",freq:"60 Hz",mvVolt:"22.9 kV",lvVolt:"380/220 V",customers:25.0,electRate:100,smartMeter:70,saidi:0.15,distRE:18,notes:"KEPCO monopoly; 22.9 kV unique distribution standard; world-class SAIDI (~9 min/yr); 60 Hz US post-war; 70% AMI; offshore wind 14 GW target 2030; EV penetration growing."},
+{country:"Sri Lanka",region:"Asia",isoId:144,numDSOs:1,company:"CEB Distribution Division + LECO (Lanka Electricity Company, urban areas)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"415/240 V",customers:8.0,electRate:99,smartMeter:10,saidi:25.0,distRE:13,notes:"CEB dominant + LECO urban; IMF reform conditions driving unbundling; rooftop solar growing under net-metering; economic crisis 2022 accelerated RE adoption; losses ~9%."},
+{country:"Syria",region:"Asia",isoId:760,numDSOs:4,company:"4 regional distribution directorates under PEEGT (Damascus, Aleppo, Homs, Lattakia)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"380/220 V",customers:4.0,electRate:75,smartMeter:2,saidi:8000.0,distRE:5,notes:"Post-Assad transitional government (Dec 2024) inheriting heavily damaged infrastructure; some areas on 1\u20132 hrs/day; private generator proliferation; reconstruction estimated USD 25 billion."},
+{country:"Taiwan",region:"Asia",isoId:158,numDSOs:1,company:"Taipower (Taiwan Power Company) Distribution",status:"Vertically Integrated",ownership:"Public",freq:"60 Hz",mvVolt:"22.8 / 11.4 kV",lvVolt:"380/110 V",customers:13.5,electRate:100,smartMeter:99,saidi:0.25,distRE:12,notes:"Taipower monopoly; 60 Hz US legacy; excellent SAIDI; 99% smart meters (Taipower own AMI system); offshore wind grid connection challenge; 380/110V LV (both 3-phase 380V and single 110V for residential)."},
+{country:"Tajikistan",region:"Asia",isoId:762,numDSOs:4,company:"Barqi Tojik regional distribution; 4 oblasts",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"380/220 V",customers:1.5,electRate:99,smartMeter:15,saidi:800.0,distRE:2,notes:"Barqi Tojik integrated; winter power cuts common (hydro reservoir management); losses 18%; CASA-1000 feeding distribution; smart meter rollout nascent."},
+{country:"Thailand",region:"Asia",isoId:764,numDSOs:2,company:"MEA (Metropolitan Electricity Authority, Bangkok) + PEA (Provincial Electricity Authority, nationwide)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 22 / 11 kV",lvVolt:"400/230 V",customers:22.0,electRate:100,smartMeter:35,saidi:1.8,distRE:20,notes:"MEA (Bangkok 3M customers) + PEA (18M+ provincial); excellent reliability PEA; smart meter 35%; rooftop solar Net Metering 3.0 + floating solar growing; EV penetration rising rapidly 2023\u201325."},
+{country:"Turkmenistan",region:"Asia",isoId:795,numDSOs:5,company:"Turkmenenergo regional distribution offices (5 velayats)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"380/220 V",customers:1.5,electRate:100,smartMeter:5,saidi:5.0,distRE:2,notes:"State integrated; electricity near-free (heavily subsidised); gas-dominated; limited RE ambition; aging Soviet-era distribution infrastructure."},
+{country:"UAE",region:"Asia",isoId:784,numDSOs:4,company:"ADDC+AADC (Abu Dhabi, TAQA group), DEWA (Dubai), SEWA (Sharjah), FEWA (Northern Emirates)",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"415/240 V",customers:3.0,electRate:100,smartMeter:100,saidi:0.4,distRE:20,notes:"DEWA world-class: SAIDI ~24 min; 100% AMI; Al Dhafra 2.1 GW + MBR solar 5 GW; ADDC/AADC Abu Dhabi; heavy A/C peak but clean energy expanding rapidly; green hydrogen export vision."},
+{country:"Uzbekistan",region:"Asia",isoId:860,numDSOs:14,company:"14 regional distribution companies under Uzbekenergo / Energy Ministry (unbundling underway 2022\u201325)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"380/220 V",customers:9.0,electRate:100,smartMeter:35,saidi:15.0,distRE:10,notes:"Unbundling reform: 14 regional DISCOs being separated from Uzbekenergo under Presidential Decree; ACWA Power solar 1.5 GW + Korean SK wind 500 MW feeding grid; smart meter 35%."},
+{country:"Vietnam",region:"Asia",isoId:704,numDSOs:5,company:"5 regional PCs (Power Corporations): NPC (North), EVNCPC (Central), SPC (South/HCMC), EVNHCMC (Ho Chi Minh City), EVNHANOI",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"22 / 15 / 10 kV",lvVolt:"400/230 V",customers:28.0,electRate:100,smartMeter:40,saidi:12.0,distRE:30,notes:"5 EVN Power Corporation subsidiaries; solar boom 2019\u201321 created massive curtailment (30%+ in Central Highlands); EVNCPC managing severe grid congestion; smart meter 40%; losses 6.5%."},
+{country:"Yemen",region:"Asia",isoId:887,numDSOs:3,company:"PEC regional distribution directorates (Sanaa, Aden, Hadhramaut zones)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"380/220 V",customers:2.0,electRate:55,smartMeter:0,saidi:15000.0,distRE:5,notes:"Grid largely destroyed by conflict since 2015; solar panels proliferating as substitute; UN estimates <2 hrs/day grid supply most areas; generator-dependent population."},
+{country:"USA",region:"North America",isoId:840,numDSOs:3000,company:"~3,000 utilities: investor-owned (IOUs) e.g. PG&E, ConEd, Duke Energy, Southern Company, Ameren + ~900 public utilities + ~850 rural electric cooperatives",status:"Mixed",ownership:"Mixed",freq:"60 Hz",mvVolt:"34.5 / 12.47 / 4.16 kV",lvVolt:"240/120 V",customers:165.0,electRate:100,smartMeter:75,saidi:7.0,distRE:28,notes:"~3,000 separate distribution utilities; 120V split-phase unique globally; SAIDI very high (420 min/yr avg) driven by severe weather events; 75% AMI 2025; major grid modernisation programmes (Grid Deployment Office); rooftop solar 5M+ homes."},
+{country:"Canada",region:"North America",isoId:124,numDSOs:60,company:"~60 provincial utilities: Hydro One (Ontario, largest), BC Hydro, Hydro-Qu\u00e9bec Distribution, SaskPower, Manitoba Hydro, Nova Scotia Power, New Brunswick Power",status:"Mixed",ownership:"Mixed",freq:"60 Hz",mvVolt:"25 / 15 / 8 kV",lvVolt:"240/120 V",customers:16.0,electRate:100,smartMeter:55,saidi:12.0,distRE:20,notes:"Provincial regulation; Hydro One (Ontario) largest DSO by area; Hydro-Qu\u00e9bec Distribution massive residential heat + EV integration; 55% AMI; storm-heavy SAIDI in Atlantic provinces."},
+{country:"Mexico",region:"North America",isoId:484,numDSOs:1,company:"CFE (Comisi\u00f3n Federal de Electricidad) Distribution \u2014 16 regional distribution divisions",status:"Vertically Integrated",ownership:"Public",freq:"60 Hz",mvVolt:"34.5 / 13.8 kV",lvVolt:"240/120 V",customers:46.0,electRate:99,smartMeter:12,saidi:10.0,distRE:22,notes:"CFE single national distributor (re-integrated post-2019 reform); 16 distribution divisions; losses 12%; smart meter nascent; solar self-supply growing especially Sonora."},
+{country:"Belize",region:"North America",isoId:84,numDSOs:1,company:"BEL (Belize Electricity Limited)",status:"Vertically Integrated",ownership:"Mixed",freq:"60 Hz",mvVolt:"12.47 kV",lvVolt:"240/120 V",customers:0.12,electRate:93,smartMeter:20,saidi:50.0,distRE:6,notes:"BEL Fortis Inc. majority; small isolated grid; hydro imports from Guatemala; some solar additions."},
+{country:"Costa Rica",region:"North America",isoId:188,numDSOs:7,company:"ICE (national) + 6 cooperative distribuidoras: COOPEGUANACASTE, COOPEALFARORUIZ, COOPELESCA, COOPESANTOS, JASEC, CNFL",status:"Mixed",ownership:"Mixed",freq:"60 Hz",mvVolt:"24.9 / 14.4 kV",lvVolt:"240/120 V",customers:1.8,electRate:100,smartMeter:30,saidi:4.5,distRE:15,notes:"ICE dominant + 6 electricity cooperatives; ~98% renewables (hydro+geo+wind); losses 9%; cooperatives historically well-run; SIEPAC connected."},
+{country:"Cuba",region:"North America",isoId:192,numDSOs:1,company:"UNE (Uni\u00f3n El\u00e9ctrica) Distribution",status:"Vertically Integrated",ownership:"Public",freq:"60 Hz",mvVolt:"13.8 kV",lvVolt:"240/120 V",customers:4.0,electRate:98,smartMeter:2,saidi:5000.0,distRE:5,notes:"UNE integrated; nationwide blackouts 8\u201318 hrs/day 2024\u201325; aging thermal fleet collapsing; fuel shortage critical; solar panels being distributed as emergency measure by government."},
+{country:"Dominican Republic",region:"North America",isoId:214,numDSOs:3,company:"Edenorte, Edesur, EdeEste (3 DISCOs, privatised 1999, now state after re-nationalisation 2003)",status:"Unbundled",ownership:"Public",freq:"60 Hz",mvVolt:"13.8 kV",lvVolt:"240/120 V",customers:3.2,electRate:95,smartMeter:15,saidi:1200.0,distRE:18,notes:"3 DISCOs under CDEEE/ETED; losses 35%+; blackouts 6\u201312 hrs/day in low-tariff areas; Punta Cana solar 240 MW + Larimar III wind 50 MW commissioned 2025."},
+{country:"El Salvador",region:"North America",isoId:222,numDSOs:4,company:"CAESS (AES, largest), DEL, CLESA, EEO (4 private DISCOs)",status:"Unbundled",ownership:"Private",freq:"60 Hz",mvVolt:"13.8 / 7.62 kV",lvVolt:"240/120 V",customers:1.7,electRate:97,smartMeter:20,saidi:30.0,distRE:16,notes:"4 privatised DISCOs; AES CAESS dominant; geothermal LaGeo 204 MW + hydro + solar; improving reliability; losses ~9%; SIEPAC connected."},
+{country:"Guatemala",region:"North America",isoId:320,numDSOs:3,company:"EEGSA (Guatemala City, Energuate, Teco subsidiary) + Distribuidora de Electricidad de Oriente + Distribuidora de Electricidad de Occidente",status:"Unbundled",ownership:"Private",freq:"60 Hz",mvVolt:"13.8 kV",lvVolt:"240/120 V",customers:3.5,electRate:92,smartMeter:18,saidi:45.0,distRE:12,notes:"3 DISCOs; EEGSA (Teco Energy/IC Power) Guatemala City; distribution losses ~12%; rural electrification via INDE; SIEPAC connected."},
+{country:"Haiti",region:"North America",isoId:332,numDSOs:1,company:"EDH (\u00c9lectricit\u00e9 d'Ha\u00efti) + proliferating private generator operators",status:"Vertically Integrated",ownership:"Public",freq:"60 Hz",mvVolt:"12.47 kV",lvVolt:"240/120 V",customers:0.6,electRate:45,smartMeter:0,saidi:15000.0,distRE:5,notes:"EDH grid nearly non-functional; gang violence disrupting infrastructure; Port-au-Prince <4 hrs/day average; solar mini-grids growing with NGO support; effective electrification far below nominal."},
+{country:"Honduras",region:"North America",isoId:340,numDSOs:1,company:"ENEE (Empresa Nacional de Energ\u00eda El\u00e9ctrica) Distribution",status:"Vertically Integrated",ownership:"Public",freq:"60 Hz",mvVolt:"34.5 / 13.8 kV",lvVolt:"240/120 V",customers:2.4,electRate:87,smartMeter:10,saidi:600.0,distRE:22,notes:"ENEE distribution; losses 34% (highest in Central America); subsidy dependency; Cerro de Hula wind 126 MW + growing solar; AMR/AMI rollout starting."},
+{country:"Jamaica",region:"North America",isoId:388,numDSOs:1,company:"JPS (Jamaica Public Service Company, Marubeni Japan majority)",status:"Vertically Integrated",ownership:"Private",freq:"50 Hz",mvVolt:"24 / 12 kV",lvVolt:"220/110 V",customers:0.68,electRate:99,smartMeter:60,saidi:35.0,distRE:22,notes:"50 Hz British legacy (unique in Caribbean); 220V LV (not 240V \u2014 British old standard); JPS Marubeni 80%; 60% AMI deployed; Wigton wind 62 MW + growing solar."},
+{country:"Nicaragua",region:"North America",isoId:558,numDSOs:1,company:"DISNORTE-DISSUR (Gas Natural Fenosa/Naturgy, Spain) \u2014 two zones",status:"Unbundled",ownership:"Private",freq:"60 Hz",mvVolt:"13.8 kV",lvVolt:"240/120 V",customers:1.1,electRate:90,smartMeter:25,saidi:25.0,distRE:35,notes:"DISNORTE (north) + DISSUR (south) both Naturgy (Spain); losses 19%; ~80% renewable electricity; good reliability vs regional peers."},
+{country:"Panama",region:"North America",isoId:591,numDSOs:3,company:"ENSA (Naturgy, north), E-LEON (Elektra Noreste), EDEMET (west), EDECHI (centre)",status:"Unbundled",ownership:"Private",freq:"60 Hz",mvVolt:"13.8 kV",lvVolt:"240/120 V",customers:1.2,electRate:95,smartMeter:30,saidi:20.0,distRE:10,notes:"3 DISCOs post-1997 privatisation; losses 12%; Panama Canal corridor reliability critical; Aguadulce solar 100 MW; SIEPAC southern terminus."},
+{country:"Trinidad & Tobago",region:"North America",isoId:780,numDSOs:1,company:"T&TEC (Trinidad & Tobago Electricity Commission)",status:"Vertically Integrated",ownership:"Public",freq:"60 Hz",mvVolt:"12 kV",lvVolt:"240/120 V",customers:0.45,electRate:100,smartMeter:40,saidi:12.0,distRE:2,notes:"T&TEC integrated; 100% gas generation; subsidised tariffs; EV adoption growing; small solar additions; not SIEPAC."},
+{country:"Argentina",region:"South America",isoId:32,numDSOs:40,company:"~40 DISCOs; main: EDENOR + EDESUR (Greater Buenos Aires, privatised 1992), Epec (C\u00f3rdoba), EDELAP, Edes (Bah\u00eda Blanca), 23 provincial utilities",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"33 / 13.2 kV",lvVolt:"380/220 V",customers:15.5,electRate:99,smartMeter:15,saidi:8.5,distRE:22,notes:"EDENOR (north Buenos Aires) + EDESUR (south, listed); 23 provincial utilities + municipalities; losses 15%; smart meter nascent; rooftop solar growing under RES framework; Milei government reform reducing subsidies."},
+{country:"Bolivia",region:"South America",isoId:68,numDSOs:6,company:"6 regional DISCOs: ELFEC (Cochabamba), ELFEO (Oruro), SEPSA (Sucre), CRE (Santa Cruz, cooperative), ENDE Andina, SETAR",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"24 / 6 kV",lvVolt:"380/220 V",customers:2.5,electRate:95,smartMeter:5,saidi:20.0,distRE:12,notes:"6 regional DISCOs incl. CRE cooperative; losses 11%; solar growing El Dorado + Oruro wind; electrification accelerating."},
+{country:"Brazil",region:"South America",isoId:76,numDSOs:65,company:"~65 DISCOs: Enel Distribution (S\u00e3o Paulo, Rio, Cear\u00e1, Goi\u00e1s), Cemig-D (Minas Gerais), Copel (Paran\u00e1), Celesc (Santa Catarina), CPFL (S\u00e3o Paulo interior), Equatorial (6 states), Neoenergia (4 states), Energisa (11 states)",status:"Unbundled",ownership:"Mixed",freq:"60 Hz",mvVolt:"34.5 / 13.8 kV",lvVolt:"380/220 V",customers:93.0,electRate:99.7,smartMeter:25,saidi:11.0,distRE:30,notes:"~65 licensed DISCOs; 4th largest distribution market globally; losses 14% avg; rural electrification Luz Para Todos programme; rooftop solar GD boom (+33 GW by 2025); ANEEL mandated smart meter rollout 2025\u201330."},
+{country:"Chile",region:"South America",isoId:152,numDSOs:30,company:"~30 DISCOs: CGE (dominant, national), Enel Distribuci\u00f3n Chile (Santiago), Chilquinta, Empresas El\u00e9ctricas, SEC (regulator, not DSO)",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"23 / 13.2 kV",lvVolt:"380/220 V",customers:7.5,electRate:100,smartMeter:35,saidi:5.5,distRE:42,notes:"~30 DISCOs; CGE (Gas Natural Fenosa/China) dominant; Enel Santiago; losses 7%; smart meter 35% (mandate by 2030); massive solar curtailment driving distributed storage urgency; EV penetration rising."},
+{country:"Colombia",region:"South America",isoId:170,numDSOs:32,company:"32 regional operators: EPM (Medell\u00edn), Codensa (Bogot\u00e1, Enel), EMCALI (Cali), Electricaribe (now Air-e + Afinia), Celsia, Enerco, Dispac",status:"Unbundled",ownership:"Mixed",freq:"60 Hz",mvVolt:"34.5 / 13.2 kV",lvVolt:"208/120 V",customers:15.5,electRate:97,smartMeter:10,saidi:9.5,distRE:14,notes:"32 DISCOs; EPM Medell\u00edn excellent performer; Air-e/Afinia replaced collapsed Electricaribe 2020; losses 12\u201330% (Caribbean coast worst); 208/120V LV from US influence in Caribbean coast regions; rural areas on solar kits."},
+{country:"Ecuador",region:"South America",isoId:218,numDSOs:10,company:"10 regional DISCOs under CENACE/MEER: EMELNORTE, EMELMANABI, EMAPA, CNEL (7 regional empresas), EEQ (Quito), ELEPCO (Latacunga), Empresa El\u00e9ctrica de Guayaquil",status:"Unbundled",ownership:"Public",freq:"60 Hz",mvVolt:"22 / 13.8 kV",lvVolt:"380/220 V",customers:5.0,electRate:99,smartMeter:10,saidi:20.0,distRE:10,notes:"10 regional DISCOs + CNEL group (coastal); losses 14%; power rationing 2024 from Coca Codo drought; solar growing in Loja; smart meter nascent."},
+{country:"Guyana",region:"South America",isoId:328,numDSOs:1,company:"GPL (Guyana Power & Light Inc.)",status:"Vertically Integrated",ownership:"Public",freq:"60 Hz",mvVolt:"69 / 12 kV",lvVolt:"240/120 V",customers:0.2,electRate:92,smartMeter:5,saidi:800.0,distRE:5,notes:"GPL state; oil boom revenues earmarked for gas-to-shore power infrastructure; isolated coastal grid; interior communities off-grid; losses 30%."},
+{country:"Paraguay",region:"South America",isoId:600,numDSOs:1,company:"ANDE (Administraci\u00f3n Nacional de Electricidad) Distribution",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"23 kV",lvVolt:"380/220 V",customers:2.0,electRate:99,smartMeter:8,saidi:45.0,distRE:2,notes:"ANDE integrated; near 100% hydro (ITAIPU surplus); lowest electricity prices in South America; losses 22%; rural electrification programme ongoing."},
+{country:"Peru",region:"South America",isoId:604,numDSOs:22,company:"~22 DISCOs: Enel Distribuci\u00f3n Per\u00fa (Lima, largest), Luz del Sur (Lima south), SEAL (Arequipa), Electronorte, Electro Sur Este, ELSE, HIDRANDINA + others",status:"Unbundled",ownership:"Mixed",freq:"60 Hz",mvVolt:"22.9 / 10 kV",lvVolt:"380/220 V",customers:8.5,electRate:96,smartMeter:12,saidi:25.0,distRE:17,notes:"~22 DISCOs; Enel + Luz del Sur (Sempra/China) Lima; 22.9 kV is unique standard; losses 10%; rural electrification via FONER programme; solar mini-grids in Amazonia; smart meter pilot Enel."},
+{country:"Suriname",region:"South America",isoId:740,numDSOs:1,company:"EBS (Energie Bedrijven Suriname N.V.)",status:"Vertically Integrated",ownership:"Public",freq:"60 Hz",mvVolt:"6.3 kV",lvVolt:"220/127 V",customers:0.15,electRate:90,smartMeter:3,saidi:800.0,distRE:5,notes:"EBS state; 220/127V legacy from Dutch colonial 127V standard; Brokopondo hydro dominant; interior off-grid; losses 18%; oil revenue funding grid expansion."},
+{country:"Uruguay",region:"South America",isoId:858,numDSOs:1,company:"UTE (Administraci\u00f3n Nacional de Usinas y Trasmisiones El\u00e9ctricas) Distribution",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"15 kV",lvVolt:"400/230 V",customers:1.5,electRate:100,smartMeter:70,saidi:3.2,distRE:48,notes:"UTE integrated + ADME market; ~98% renewables by generation; 70% smart meters; strong prosumer framework; EV adoption growing; one of most advanced small grids in Latin America."},
+{country:"Venezuela",region:"South America",isoId:862,numDSOs:14,company:"14 regional CORPOELEC subsidiaries: Electricidad de Caracas, C.A., Cadafe subsidiaries, regional ELECAR, ELECENTRO, ELEORIENTE, etc.",status:"Vertically Integrated",ownership:"Public",freq:"60 Hz",mvVolt:"34.5 / 13.8 kV",lvVolt:"240/120 V",customers:7.5,electRate:95,smartMeter:2,saidi:7000.0,distRE:5,notes:"CORPOELEC nationalised 2007; 14 subsidiaries; severe crisis\u20148\u201316 hrs/day blackouts; Guri HPP 10.2 GW but grid maintenance collapsed; losses 40%+; population using inverters+batteries from petrol generators as backup."},
+{country:"Australia",region:"Oceania",isoId:36,numDSOs:13,company:"NEM: Energex (QLD), Ergon (QLD rural), Ausgrid (NSW), Endeavour Energy (NSW), Essential Energy (NSW), CitiPower/Powercor (VIC, private), United Energy (VIC), AusNet Services (VIC, private), SA Power Networks (private); WA: Western Power; TAS: TasNetworks",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"22 / 11 kV",lvVolt:"415/240 V",customers:11.0,electRate:100,smartMeter:65,saidi:2.5,distRE:48,notes:"13 DNSPs (Distribution Network Service Providers) across states; Ausgrid (NSW, world's most valuable DSO); rooftop solar 35%+ homes = world record; SAIDI improving despite rooftop solar volatility; smart meter 65% by 2025; massive EV/battery integration challenge."},
+{country:"Fiji",region:"Oceania",isoId:242,numDSOs:1,company:"EFL (Energy Fiji Limited)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"11 kV",lvVolt:"415/240 V",customers:0.25,electRate:98,smartMeter:35,saidi:15.0,distRE:13,notes:"EFL integrated; Viti Levu main grid; outer islands on diesel mini-grids; cyclone resilience investment ongoing; rooftop solar growing."},
+{country:"New Zealand",region:"Oceania",isoId:554,numDSOs:29,company:"~29 ELBs (Electricity Lines Businesses): Vector (Auckland, largest), Orion NZ, WEL Networks, Horizon Energy, Unison Networks, Powerco",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"22 / 11 kV",lvVolt:"400/230 V",customers:2.1,electRate:100,smartMeter:75,saidi:1.8,distRE:22,notes:"~29 ELBs regulated by Commerce Commission; Vector Auckland dominant; excellent reliability; 75% smart meters; 90% renewable electricity; EV penetration among highest globally; offshore wind planned."},
+{country:"Papua New Guinea",region:"Oceania",isoId:598,numDSOs:3,company:"PNG Power Ltd. (Port Moresby, Lae, Madang isolated grids)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"11 kV",lvVolt:"415/240 V",customers:0.2,electRate:15,smartMeter:0,saidi:5000.0,distRE:5,notes:"~15% electrification; 3 isolated urban grids; rural communities on diesel; LNG revenues not reaching electrification; ADB funding grid expansion."},
+{country:"Samoa",region:"Oceania",isoId:882,numDSOs:1,company:"EPC (Electric Power Corporation)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"11 kV",lvVolt:"400/230 V",customers:0.05,electRate:98,smartMeter:20,saidi:25.0,distRE:22,notes:"EPC integrated; rooftop solar growing via ADB funding; cyclone resilience investment; 2030 target 60%+ RE."},
+{country:"Solomon Islands",region:"Oceania",isoId:90,numDSOs:1,company:"SIEA (Solomon Islands Electricity Authority)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"11 kV",lvVolt:"415/240 V",customers:0.03,electRate:25,smartMeter:0,saidi:3000.0,distRE:11,notes:"Honiara grid only; outer islands off-grid on diesel; Tina River HPP 15 MW under construction; SIDS climate vulnerability; Chinese infrastructure interest."},
+{country:"Vanuatu",region:"Oceania",isoId:548,numDSOs:1,company:"UNELCO (Engie concession) + VANUATU UTILITIES SERVICES (VUS) for outer islands",status:"Vertically Integrated",ownership:"Private",freq:"50 Hz",mvVolt:"11 kV",lvVolt:"415/240 V",customers:0.04,electRate:35,smartMeter:5,saidi:200.0,distRE:17,notes:"UNELCO Engie concession Port Vila; outer islands on diesel + solar mini-grids; cyclone resilience priority; ADB SIDS solar programme active."}
+];
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+const fmt=n=>n>=1000?(n/1000).toFixed(0)+'K':n>=100?Math.round(n).toString():n>=10?n.toFixed(1):n.toFixed(2);
+const fmtM=n=>n>=1?n.toFixed(1)+'M':Math.round(n*1000)+'K';
+const statusBadge=s=>({'Unbundled':'<span class="badge bu">Unbundled</span>','Vertically Integrated':'<span class="badge bvi">Vert. Integrated</span>','Mixed':'<span class="badge bm">Mixed</span>'}[s]||s);
+const ownBadge=o=>({'Public':'<span class="badge bpub">Public</span>','Private':'<span class="badge bprv">Private</span>','Mixed':'<span class="badge bmix">Mixed</span>'}[o]||o);
+const freqBadge=f=>f==='50 Hz'?'<span class="badge bf50">50 Hz</span>':f==='60 Hz'?'<span class="badge bf60">60 Hz</span>':'<span class="badge bfmix">50/60 Hz</span>';
+
+// Color ramps — green (good) / grey (mid) / red (bad)
+const saidiColor=v=>v<=1?'#155a35':v<=5?'#2a7a4e':v<=20?'#3e9e6a':v<=100?'#949498':v<=500?'#d45858':'#b83838';
+const electColor=v=>v>=99?'#155a35':v>=90?'#2a7a4e':v>=75?'#3e9e6a':v>=50?'#949498':v>=25?'#d45858':'#b83838';
+const smColor=v=>v>=90?'#155a35':v>=60?'#2a7a4e':v>=30?'#3e9e6a':v>=10?'#949498':v>=3?'#d45858':'#b83838';
+const reColor=v=>v>=50?'#155a35':v>=35?'#2a7a4e':v>=20?'#3e9e6a':v>=10?'#949498':v>=5?'#d45858':'#b83838';
+
+// ── SORT ──────────────────────────────────────────────────────────────────────
+let sortKey='country',sortDir=1;
+function sortBy(k){
+  if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}
+  document.querySelectorAll('thead th').forEach(t=>t.className='');
+  const th=document.getElementById('th-'+k);
+  if(th)th.className=sortDir===1?'sa':'sd';
+  render();
+}
+
+// ── FILTERS ───────────────────────────────────────────────────────────────────
+function getFiltered(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const r=document.getElementById('regFilter').value;
+  const s=document.getElementById('statFilter').value;
+  const o=document.getElementById('ownFilter').value;
+  const f=document.getElementById('freqFilter').value;
+  return DATA.filter(d=>{
+    if(r&&d.region!==r)return false;
+    if(s&&d.status!==s)return false;
+    if(o&&d.ownership!==o)return false;
+    if(f&&d.freq!==f)return false;
+    if(q&&!d.country.toLowerCase().includes(q)&&!d.company.toLowerCase().includes(q))return false;
+    return true;
+  }).sort((a,b)=>{
+    let av=a[sortKey],bv=b[sortKey];
+    if(typeof av==='number')return(av-bv)*sortDir;
+    return String(av).localeCompare(String(bv))*sortDir;
+  });
+}
+function resetFilters(){
+  ['searchInput','regFilter','statFilter','ownFilter','freqFilter'].forEach(id=>{document.getElementById(id).value='';});
+  render();
+}
+
+// ── TABLE RENDER ──────────────────────────────────────────────────────────────
+function render(){
+  const filtered=getFiltered();
+  document.getElementById('rcN').textContent=filtered.length;
+  document.getElementById('rcT').textContent=DATA.length;
+  const tbody=document.getElementById('tbody');
+  const noData=document.getElementById('noData');
+  if(!filtered.length){tbody.innerHTML='';noData.style.display='';return;}
+  noData.style.display='none';
+  tbody.innerHTML=filtered.map(d=>`<tr>
+    <td>${d.country}<span class="bflag">${d.region}</span></td>
+    <td style="font-size:.6rem;color:var(--text3)">${d.region}</td>
+    <td style="text-align:center;font-weight:600;color:var(--text)">${d.numDSOs.toLocaleString()}</td>
+    <td style="max-width:220px;font-size:.62rem;line-height:1.38">${d.company}</td>
+    <td>${statusBadge(d.status)}</td>
+    <td>${ownBadge(d.ownership)}</td>
+    <td>${freqBadge(d.freq)}</td>
+    <td><span class="vol">${d.mvVolt}<br><span style="color:var(--text3)">${d.lvVolt}</span></span></td>
+    <td style="text-align:center;font-weight:600">${fmtM(d.customers)}</td>
+    <td>
+      <div class="re-small-wrap">
+        <div class="re-small-track"><div class="re-small-fill" style="width:${d.electRate}%;background:${electColor(d.electRate)}"></div></div>
+        <span class="re-small-pct" style="color:${electColor(d.electRate)}">${d.electRate}%</span>
+      </div>
+    </td>
+    <td>
+      <div class="re-small-wrap">
+        <div class="re-small-track"><div class="re-small-fill" style="width:${d.smartMeter}%;background:${smColor(d.smartMeter)}"></div></div>
+        <span class="re-small-pct" style="color:${smColor(d.smartMeter)}">${d.smartMeter}%</span>
+      </div>
+    </td>
+    <td style="text-align:center"><span style="font-weight:600;color:${saidiColor(d.saidi)}">${d.saidi>=1000?(d.saidi/1000).toFixed(1)+'K':d.saidi.toFixed(d.saidi<10?1:0)}</span></td>
+    <td>
+      <div class="re-small-wrap">
+        <div class="re-small-track"><div class="re-small-fill" style="width:${Math.min(d.distRE,100)}%;background:${reColor(d.distRE)}"></div></div>
+        <span class="re-small-pct" style="color:${reColor(d.distRE)}">${d.distRE}%</span>
+      </div>
+    </td>
+    <td><span class="note-cell">${d.notes}</span></td>
+  </tr>`).join('');
+}
+
+// ── STATS CARDS ───────────────────────────────────────────────────────────────
+function buildStats(){
+  const total=DATA.length;
+  const ub=DATA.filter(d=>d.status==='Unbundled').length;
+  const vi=DATA.filter(d=>d.status==='Vertically Integrated').length;
+  const pub=DATA.filter(d=>d.ownership==='Public').length;
+  const prv=DATA.filter(d=>d.ownership==='Private').length;
+  const hz50=DATA.filter(d=>d.freq==='50 Hz').length;
+  const hz60=DATA.filter(d=>d.freq==='60 Hz').length;
+  const totalDSOs=DATA.reduce((a,d)=>a+d.numDSOs,0);
+  const totalCust=DATA.reduce((a,d)=>a+d.customers,0);
+  const avgElect=Math.round(DATA.reduce((a,d)=>a+d.electRate,0)/total);
+  const avgSM=Math.round(DATA.reduce((a,d)=>a+d.smartMeter,0)/total);
+  const cards=[
+    {cls:'a',num:total,label:'Countries Covered',sub:'Global dataset'},
+    {cls:'g',num:ub,label:'Unbundled Systems',sub:`${Math.round(ub/total*100)}% of total`},
+    {cls:'r',num:vi,label:'Vertically Integrated',sub:`${Math.round(vi/total*100)}% of total`},
+    {cls:'b',num:pub,label:'Public Ownership',sub:`${Math.round(pub/total*100)}% of total`},
+    {cls:'p',num:prv,label:'Private Ownership',sub:`${Math.round(prv/total*100)}% of total`},
+    {cls:'b',num:hz50,label:'50 Hz Systems',sub:`${hz60} countries on 60 Hz`},
+    {cls:'a',num:totalDSOs.toLocaleString()+'+',label:'Total DSOs Tracked',sub:'Across all countries'},
+    {cls:'t',num:totalCust.toFixed(0)+'M',label:'Customers Connected',sub:'Distribution-connected'},
+    {cls:'g',num:avgElect+'%',label:'Avg Electrification',sub:'Population connected'},
+    {cls:'gr',num:avgSM+'%',label:'Avg Smart Meter Pen.',sub:'AMI / AMR penetration'},
+  ];
+  document.getElementById('statsRow').innerHTML=cards.map(c=>`<div class="sc ${c.cls}"><div class="sn">${c.num}</div><div class="sl">${c.label}</div><div class="ss">${c.sub}</div></div>`).join('');
+}
+
+// ── REGIONAL CARDS ────────────────────────────────────────────────────────────
+function buildRegional(){
+  const regions=['Africa','Europe','Asia','North America','South America','Oceania'];
+  document.getElementById('regRow').innerHTML=regions.map(r=>{
+    const items=DATA.filter(d=>d.region===r);
+    const ub=items.filter(d=>d.status==='Unbundled').length;
+    const vi=items.filter(d=>d.status==='Vertically Integrated').length;
+    const avgE=Math.round(items.reduce((a,d)=>a+d.electRate,0)/items.length);
+    const avgS=Math.round(items.reduce((a,d)=>a+d.smartMeter,0)/items.length);
+    const avgSAIDI=(items.reduce((a,d)=>a+d.saidi,0)/items.length).toFixed(0);
+    return `<div class="reg-card">
+      <div class="reg-name">${r}</div>
+      <div class="reg-num">${items.length}</div>
+      <div class="reg-sub">UB:${ub} VI:${vi}<br>Electrif:${avgE}% · AMI:${avgS}%<br>SAIDI:${avgSAIDI}h avg</div>
+    </div>`;
+  }).join('');
+}
+
+// ── CHARTS ────────────────────────────────────────────────────────────────────
+function buildCharts(){
+  const ub=DATA.filter(d=>d.status==='Unbundled').length;
+  const vi=DATA.filter(d=>d.status==='Vertically Integrated').length;
+  const mx=DATA.filter(d=>d.status==='Mixed').length;
+  const pub=DATA.filter(d=>d.ownership==='Public').length;
+  const prv=DATA.filter(d=>d.ownership==='Private').length;
+  const mixo=DATA.filter(d=>d.ownership==='Mixed').length;
+  const regions=['Africa','Asia','Europe','North America','South America','Oceania'];
+  const donutOpts={responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed} countries`}}}};
+  new Chart(document.getElementById('cStatus'),{type:'doughnut',data:{labels:['Unbundled','Vertically Integrated','Mixed'],datasets:[{data:[ub,vi,mx],backgroundColor:['#2a7a4e','#b83838','#3a70c8'],borderWidth:3,borderColor:'#fffdf8'}]},options:donutOpts});
+  new Chart(document.getElementById('cOwn'),{type:'doughnut',data:{labels:['Public','Private','Mixed'],datasets:[{data:[pub,prv,mixo],backgroundColor:['#3a70c8','#6b6b78','#6494d8'],borderWidth:3,borderColor:'#fffdf8'}]},options:donutOpts});
+  new Chart(document.getElementById('cRegion'),{type:'bar',
+    data:{labels:regions.map(r=>r.length>12?r.substring(0,10)+'…':r),datasets:[
+      {label:'Unbundled',data:regions.map(r=>DATA.filter(d=>d.region===r&&d.status==='Unbundled').length),backgroundColor:'#2a7a4e',borderWidth:0,borderRadius:3},
+      {label:'Vert. Integrated',data:regions.map(r=>DATA.filter(d=>d.region===r&&d.status==='Vertically Integrated').length),backgroundColor:'#b83838',borderWidth:0,borderRadius:3},
+      {label:'Mixed',data:regions.map(r=>DATA.filter(d=>d.region===r&&d.status==='Mixed').length),backgroundColor:'#3a70c8',borderWidth:0,borderRadius:3},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#968b76',font:{family:'JetBrains Mono',size:9},boxWidth:9,padding:10}}},
+      scales:{x:{stacked:true,ticks:{color:'#948b78',font:{family:'JetBrains Mono',size:8}},grid:{color:'rgba(26,22,18,.06)'}},
+        y:{stacked:true,ticks:{color:'#948b78',font:{family:'JetBrains Mono',size:8}},grid:{color:'rgba(26,22,18,.06)'}}}}
+  });
+  document.getElementById('legStatus').innerHTML=[{c:'#2a7a4e',l:`Unbundled (${ub})`},{c:'#b83838',l:`Vert. Integrated (${vi})`},{c:'#3a70c8',l:`Mixed (${mx})`}].map(x=>`<span class="cl-item"><span class="cl-sq" style="background:${x.c}"></span>${x.l}</span>`).join('');
+  document.getElementById('legOwn').innerHTML=[{c:'#3a70c8',l:`Public (${pub})`},{c:'#6b6b78',l:`Private (${prv})`},{c:'#6494d8',l:`Mixed (${mixo})`}].map(x=>`<span class="cl-item"><span class="cl-sq" style="background:${x.c}"></span>${x.l}</span>`).join('');
+}
+
+// ── MAP ───────────────────────────────────────────────────────────────────────
+let colorMode='status';
+let pathSel;
+const dataLookup={};
+DATA.forEach(d=>{
+  const k=String(d.isoId).padStart(3,'0');
+  dataLookup[k]=d;
+  dataLookup[String(d.isoId)]=d;
+});
+const STATUS_COLORS={'Unbundled':'#2a7a4e','Vertically Integrated':'#b83838','Mixed':'#3a70c8'};
+const OWN_COLORS={'Public':'#3a70c8','Private':'#6b6b78','Mixed':'#6494d8'};
+const FREQ_COLORS={'50 Hz':'#3a70c8','60 Hz':'#2a7a4e','50/60 Hz':'#6b6b78'};
+const NO_DATA='#d8cdb8';
+
+function getCountryColor(feat){
+  const rec=dataLookup[String(feat.id).padStart(3,'0')]||dataLookup[String(feat.id)];
+  if(!rec)return NO_DATA;
+  if(colorMode==='status')return STATUS_COLORS[rec.status]||NO_DATA;
+  if(colorMode==='ownership')return OWN_COLORS[rec.ownership]||NO_DATA;
+  if(colorMode==='freq')return FREQ_COLORS[rec.freq]||NO_DATA;
+  if(colorMode==='electRate')return electColor(rec.electRate);
+  if(colorMode==='smartMeter')return smColor(rec.smartMeter);
+  if(colorMode==='saidi')return saidiColor(rec.saidi);
+  if(colorMode==='distRE')return reColor(rec.distRE);
+  return NO_DATA;
+}
+
+function setMode(m){
+  colorMode=m;
+  ['status','ownership','freq','electRate','smartMeter','saidi','distRE'].forEach(id=>document.getElementById('btn-'+id).classList.remove('active'));
+  document.getElementById('btn-'+m).classList.add('active');
+  if(pathSel)pathSel.attr('fill',d=>getCountryColor(d));
+  buildMapLegend();
+}
+
+const GRAD_ITEMS_GOOD=[{c:'#b83838',l:'Very Low'},{c:'#d45858',l:'Low'},{c:'#949498',l:'Medium'},{c:'#3e9e6a',l:'High'},{c:'#2a7a4e',l:'Very High'},{c:'#155a35',l:'Excellent'}];
+const GRAD_ITEMS_BAD=[{c:'#155a35',l:'Excellent'},{c:'#2a7a4e',l:'Very Good'},{c:'#3e9e6a',l:'Good'},{c:'#949498',l:'Moderate'},{c:'#d45858',l:'Poor'},{c:'#b83838',l:'Crisis'}];
+
+function buildMapLegend(){
+  const leg=document.getElementById('mapLegend');
+  const noDataItem=`<span class="ml-item"><span class="ml-dot" style="background:${NO_DATA}"></span>No Data</span>`;
+  if(colorMode==='status'){
+    leg.innerHTML=`<span class="ml-label">Legal Status</span><div class="ml-items">${[{c:'#2a7a4e',l:'Unbundled'},{c:'#b83838',l:'Vert. Integrated'},{c:'#3a70c8',l:'Mixed'}].map(x=>`<span class="ml-item"><span class="ml-dot" style="background:${x.c}"></span>${x.l}</span>`).join('')}${noDataItem}</div>`;
+  } else if(colorMode==='ownership'){
+    leg.innerHTML=`<span class="ml-label">Ownership</span><div class="ml-items">${[{c:'#3a70c8',l:'Public'},{c:'#6b6b78',l:'Private'},{c:'#6494d8',l:'Mixed'}].map(x=>`<span class="ml-item"><span class="ml-dot" style="background:${x.c}"></span>${x.l}</span>`).join('')}${noDataItem}</div>`;
+  } else if(colorMode==='freq'){
+    leg.innerHTML=`<span class="ml-label">System Frequency</span><div class="ml-items">${[{c:'#3a70c8',l:'50 Hz'},{c:'#2a7a4e',l:'60 Hz'},{c:'#6b6b78',l:'50/60 Hz (Japan)'}].map(x=>`<span class="ml-item"><span class="ml-dot" style="background:${x.c}"></span>${x.l}</span>`).join('')}${noDataItem}</div>`;
+  } else if(colorMode==='electRate'){
+    leg.innerHTML=`<span class="ml-label">Electrification Rate</span><div class="ml-items">${GRAD_ITEMS_GOOD.map(x=>`<span class="ml-item"><span class="ml-dot" style="background:${x.c}"></span>${x.l}</span>`).join('')}${noDataItem}</div><div style="margin-top:5px;font-family:var(--fm);font-size:.52rem;color:var(--text4)">Red &lt;25% · Orange 25–50% · Grey 50–75% · Light Green 75–90% · Green 90–99% · Dark Green 99–100%</div>`;
+  } else if(colorMode==='smartMeter'){
+    leg.innerHTML=`<span class="ml-label">Smart Meter Penetration</span><div class="ml-items">${GRAD_ITEMS_GOOD.map(x=>`<span class="ml-item"><span class="ml-dot" style="background:${x.c}"></span>${x.l}</span>`).join('')}${noDataItem}</div><div style="margin-top:5px;font-family:var(--fm);font-size:.52rem;color:var(--text4)">Red &lt;3% · Orange 3–10% · Grey 10–30% · Light Green 30–60% · Green 60–90% · Dark Green ≥90%</div>`;
+  } else if(colorMode==='saidi'){
+    leg.innerHTML=`<span class="ml-label">SAIDI Reliability (hours/yr — lower is better)</span><div class="ml-items">${GRAD_ITEMS_BAD.map(x=>`<span class="ml-item"><span class="ml-dot" style="background:${x.c}"></span>${x.l}</span>`).join('')}${noDataItem}</div><div style="margin-top:5px;font-family:var(--fm);font-size:.52rem;color:var(--text4)">Dark Green ≤1h · Green 1–5h · Light Green 5–20h · Grey 20–100h · Orange 100–500h · Red ≥500h</div>`;
+  } else {
+    leg.innerHTML=`<span class="ml-label">Distributed RE Share (% of distribution-connected capacity)</span><div class="ml-items">${GRAD_ITEMS_GOOD.map(x=>`<span class="ml-item"><span class="ml-dot" style="background:${x.c}"></span>${x.l}</span>`).join('')}${noDataItem}</div>`;
+  }
+}
+
+async function buildMap(){
+  const outer=document.getElementById('mapOuter');
+  const svg=d3.select('#mapSvg');
+  const W=outer.clientWidth||900;
+  const H=Math.min(Math.max(W*0.47,300),510);
+  svg.attr('height',H);
+  const proj=d3.geoNaturalEarth1().scale(W/6.3).translate([W/2,H/2]);
+  const path=d3.geoPath(proj);
+  svg.append('rect').attr('width','100%').attr('height',H).attr('fill','#c4d4e6');
+  const grat=d3.geoGraticule()();
+  svg.append('path').datum(grat).attr('d',path).attr('fill','none').attr('stroke','#a0b4c8').attr('stroke-width',.25);
+  let world;
+  try{world=await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');}
+  catch(e){svg.append('text').attr('x',W/2).attr('y',H/2).attr('text-anchor','middle').attr('fill','#b83838').attr('font-family','JetBrains Mono').attr('font-size',12).text('Map could not load — check internet connection');return;}
+  const countries=topojson.feature(world,world.objects.countries);
+  const borders=topojson.mesh(world,world.objects.countries,(a,b)=>a!==b);
+  const zoom=d3.zoom().scaleExtent([1,8]).on('zoom',e=>g.attr('transform',e.transform));
+  svg.call(zoom);
+  const g=svg.append('g');
+  const tip=document.getElementById('mapTooltip');
+  pathSel=g.selectAll('path.country').data(countries.features).join('path')
+    .attr('class','country').attr('d',path)
+    .attr('fill',d=>getCountryColor(d))
+    .attr('stroke','#b0a898').attr('stroke-width',.4)
+    .style('cursor',d=>(dataLookup[String(d.id).padStart(3,'0')])?'pointer':'default')
+    .on('mousemove',function(event,d){
+      const key=String(d.id).padStart(3,'0');
+      const rec=dataLookup[key];
+      if(!rec){tip.style.opacity='0';return;}
+      d3.select(this).raise().attr('stroke','#1e4fa0').attr('stroke-width',1.8);
+      const cv=colorMode==='status'?rec.status:colorMode==='ownership'?rec.ownership:colorMode==='freq'?rec.freq:colorMode==='electRate'?`Electrif: ${rec.electRate}%`:colorMode==='smartMeter'?`Smart: ${rec.smartMeter}%`:colorMode==='saidi'?`SAIDI: ${rec.saidi}h/yr`:`Dist.RE: ${rec.distRE}%`;
+      tip.innerHTML=`<div class="mtt-name">${rec.country}</div><div style="color:var(--text3);font-size:.55rem">${rec.region}</div><div style="margin-top:4px;font-size:.6rem">${cv}</div><div style="font-size:.55rem;color:var(--text3);margin-top:1px">${rec.numDSOs} DSO${rec.numDSOs>1?'s':''} · ${rec.freq}</div>`;
+      tip.style.left=(event.clientX+14)+'px';tip.style.top=(event.clientY-10)+'px';tip.style.opacity='1';
+    })
+    .on('mouseleave',function(){d3.select(this).attr('stroke','#b0a898').attr('stroke-width',.4);tip.style.opacity='0';})
+    .on('click',function(event,d){
+      const rec=dataLookup[String(d.id).padStart(3,'0')]||dataLookup[String(d.id)];
+      if(rec)showPanel(rec);
+    });
+  g.append('path').datum(borders).attr('d',path).attr('fill','none').attr('stroke','#968b78').attr('stroke-width',.3);
+  // Zoom controls
+  const zc=svg.append('g').attr('transform',`translate(${W-46},${H-80})`);
+  [{sym:'+',dy:0,fn:()=>svg.transition().call(zoom.scaleBy,1.5)},{sym:'−',dy:26,fn:()=>svg.transition().call(zoom.scaleBy,.67)},{sym:'⌂',dy:52,fn:()=>svg.transition().call(zoom.transform,d3.zoomIdentity)}].forEach(b=>{
+    const bg=zc.append('g').style('cursor','pointer').on('click',b.fn);
+    bg.append('rect').attr('y',b.dy).attr('width',22).attr('height',22).attr('rx',3).attr('fill','#fffdf8').attr('stroke','rgba(26,22,18,.18)').attr('stroke-width',.6);
+    bg.append('text').attr('x',11).attr('y',b.dy+15).attr('text-anchor','middle').attr('fill','#52483e').attr('font-family','JetBrains Mono').attr('font-size',12).text(b.sym);
+  });
+  buildMapLegend();
+}
+
+// ── COUNTRY PANEL ─────────────────────────────────────────────────────────────
+function showPanel(rec){
+  document.getElementById('cpName').textContent=rec.country;
+  document.getElementById('cpRegion').textContent=rec.region;
+  const fClass=rec.freq==='50 Hz'?'freq-50':rec.freq==='60 Hz'?'freq-60':'freq-mix';
+  // SAIDI color
+  const sc=saidiColor(rec.saidi);
+  const ec=electColor(rec.electRate);
+  const smc=smColor(rec.smartMeter);
+  const rc=reColor(rec.distRE);
+  const saidiStr=rec.saidi>=1000?`${(rec.saidi/1000).toFixed(1)}K hrs/yr (${Math.round(rec.saidi/24)} days/yr)`:rec.saidi>=100?`${Math.round(rec.saidi)} hrs/yr`:rec.saidi<1?`${(rec.saidi*60).toFixed(0)} min/yr`:`${rec.saidi.toFixed(1)} hrs/yr`;
+
+  document.getElementById('cpBody').innerHTML=`
+    <div class="cp-row"><div class="cp-label">Distribution Operator(s)</div><div class="cp-company">${rec.company}</div></div>
+    <div class="cp-divider"></div>
+    <div class="cp-row2">
+      <div><div class="cp-label">Legal Status</div><div style="margin-top:3px">${statusBadge(rec.status)}</div></div>
+      <div><div class="cp-label">Ownership</div><div style="margin-top:3px">${ownBadge(rec.ownership)}</div></div>
+    </div>
+    <div class="cp-row2">
+      <div><div class="cp-label"># DSOs</div><div class="cp-val-big" style="color:var(--amber)">${rec.numDSOs.toLocaleString()}</div></div>
+      <div><div class="cp-label">System Freq.</div><div style="margin-top:4px"><span class="freq-pill ${fClass}">${rec.freq}</span></div></div>
+    </div>
+    <div class="cp-divider"></div>
+    <div class="cp-row2">
+      <div><div class="cp-label">MV Voltage</div><div class="cp-val">${rec.mvVolt}</div></div>
+      <div><div class="cp-label">LV Voltage</div><div class="cp-val">${rec.lvVolt}</div></div>
+    </div>
+    <div class="cp-divider"></div>
+    <div class="cp-row">
+      <div class="cp-label">Electrification Rate</div>
+      <div class="cp-val-big" style="color:${ec}">${rec.electRate}%</div>
+      <div class="metric-bar"><div class="m-track"><div class="m-fill" style="width:${rec.electRate}%;background:${ec}"></div></div></div>
+    </div>
+    <div class="cp-row">
+      <div class="cp-label">Smart Meter Penetration (AMI/AMR)</div>
+      <div class="cp-val-big" style="color:${smc}">${rec.smartMeter}%</div>
+      <div class="metric-bar"><div class="m-track"><div class="m-fill" style="width:${rec.smartMeter}%;background:${smc}"></div></div></div>
+    </div>
+    <div class="cp-row">
+      <div class="cp-label">SAIDI — System Average Interruption Duration</div>
+      <div style="margin-top:5px"><span class="saidi-pill" style="background:${sc}22;color:${sc};border:1px solid ${sc}44">${saidiStr}</span></div>
+      <div style="font-size:.55rem;color:var(--text4);margin-top:4px">Lower = more reliable. EU best: ~6 min/yr (Japan). Crisis: >1,000 hrs/yr.</div>
+    </div>
+    <div class="cp-row">
+      <div class="cp-label">Distributed RE (% of dist-connected capacity)</div>
+      <div class="cp-val-big" style="color:${rc}">${rec.distRE}%</div>
+      <div class="metric-bar"><div class="m-track"><div class="m-fill" style="width:${Math.min(rec.distRE,100)}%;background:${rc}"></div></div></div>
+    </div>
+    <div class="cp-divider"></div>
+    <div class="cp-row"><div class="cp-label">Customers Connected</div><div class="cp-val">${rec.customers>=1?rec.customers.toFixed(1)+' million':(rec.customers*1000).toFixed(0)+'K'} (${fmtM(rec.customers)})</div></div>
+    <div class="cp-divider"></div>
+    <div class="cp-row"><div class="cp-label">Notes</div><div class="cp-val" style="font-size:.6rem;color:var(--text3);line-height:1.55">${rec.notes}</div></div>
+  `;
+  document.getElementById('countryPanel').classList.add('open');
+}
+function closePanel(){document.getElementById('countryPanel').classList.remove('open');}
+document.addEventListener('click',e=>{if(!e.target.closest('#countryPanel')&&!e.target.closest('#mapSvg'))closePanel();});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  buildStats();buildRegional();buildCharts();render();buildMap();
+  ['searchInput','regFilter','statFilter','ownFilter','freqFilter'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.addEventListener('input',render);el.addEventListener('change',render);
+  });
+  document.getElementById('th-country').className='sa';
+});
+</script>
+</body>
+</html>
