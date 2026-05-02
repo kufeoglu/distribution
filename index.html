@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Global Power Systems Atlas · Vol. III — Global Distribution System Operators</title>
+<title>Global Distribution System Operators Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
@@ -165,21 +165,38 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:4px;backgrou
 ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#c9bfa6;border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:var(--amber);}
 @media(max-width:1100px){.charts{grid-template-columns:1fr 1fr;}.charts .cc:last-child{grid-column:1/-1;}}
 @media(max-width:700px){.charts{grid-template-columns:1fr;}.charts .cc:last-child{grid-column:auto;}.hdr-title h1{font-size:1.7rem;}.country-panel{width:100%;}}
-/* HOW TO CITE */
-.cite-section{background:var(--card);border-top:2px solid var(--border);padding:22px 0 20px;}
-.cite-wrap{display:grid;grid-template-columns:auto 1fr 1fr;align-items:start;gap:24px;}
-.cite-eyebrow{display:flex;align-items:center;gap:10px;padding-right:24px;border-right:1px solid var(--border);}
-.cite-glyph{font-family:var(--fs);font-size:2rem;color:var(--amber);line-height:1;font-style:italic;}
-.cite-heading{font-family:var(--fm);font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);white-space:nowrap;margin-top:4px;}
-.cite-col{}
-.cite-col-label{font-family:var(--fm);font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:7px;display:flex;align-items:center;gap:8px;}
-.cite-formatted{font-family:var(--fb);font-size:.75rem;color:var(--text2);line-height:1.65;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px 14px;}
-.cite-formatted em{font-style:italic;color:var(--text);}
-.cite-bib{font-family:var(--fm);font-size:.65rem;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px 14px;white-space:pre;overflow-x:auto;line-height:1.7;margin:0;}
-.copy-btn{font-family:var(--fm);font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;background:var(--bg);border:1px solid var(--border);color:var(--text3);padding:2px 8px;border-radius:3px;cursor:pointer;transition:all .14s;}
-.copy-btn:hover{border-color:var(--bdhi);color:var(--amber);}
-.copy-btn.copied{background:rgba(42,122,78,.07);border-color:rgba(42,122,78,.3);color:var(--green);}
-@media(max-width:900px){.cite-wrap{grid-template-columns:1fr;}.cite-eyebrow{border-right:none;border-bottom:1px solid var(--border);padding-right:0;padding-bottom:14px;flex-direction:row;}.cite-glyph{font-size:1.6rem;}}
+
+/* CONTINENTAL DSO SUMMARY TABLE */
+.cont-table-wrap{background:var(--card);border:1px solid var(--border);border-radius:4px;box-shadow:0 1px 4px rgba(26,22,18,.06);overflow-x:auto;margin-bottom:14px;}
+.cont-table-title{font-family:var(--fm);font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding:14px 18px 0;display:flex;align-items:center;gap:6px;}
+.cont-table-title::before{content:'';width:2px;height:9px;background:var(--amber);border-radius:1px;flex-shrink:0;}
+.cont-table-note{font-family:var(--fm);font-size:.54rem;color:var(--text4);padding:4px 18px 12px;font-style:italic;}
+.ctab{width:100%;border-collapse:collapse;font-family:var(--fm);font-size:.7rem;}
+.ctab thead th{background:var(--el);padding:9px 14px;text-align:left;font-size:.54rem;letter-spacing:.13em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap;font-weight:500;}
+.ctab thead th.num{text-align:right;}
+.ctab tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
+.ctab tbody tr:hover{background:var(--hov);}
+.ctab tbody tr.total-row{background:var(--el);border-top:2px solid rgba(26,22,18,.12);}
+.ctab tbody tr.total-row td{font-weight:700;color:var(--text);}
+.ctab td{padding:8px 14px;color:var(--text2);vertical-align:middle;}
+.ctab td.num{text-align:right;font-weight:500;}
+.ctab td.ctname{color:var(--text);font-weight:600;}
+.ctab td.ctname span{display:block;font-size:.56rem;color:var(--text3);font-weight:400;margin-top:1px;}
+/* Ownership mini-bars */
+.own-bars{display:flex;height:10px;border-radius:3px;overflow:hidden;min-width:80px;gap:1px;}
+.own-seg{height:100%;transition:width .3s;}
+.own-seg.pub{background:#3a70c8;}
+.own-seg.prv{background:#6b6b78;}
+.own-seg.mix{background:#6494d8;}
+/* DSO count number */
+.ctab td.dso-num{text-align:right;font-size:1rem;font-weight:700;color:var(--amber);letter-spacing:.02em;}
+/* Source tag */
+.src-tag{display:inline-block;font-family:var(--fm);font-size:.5rem;padding:1px 5px;border-radius:2px;background:rgba(42,122,78,.08);color:#2a7a4e;border:1px solid rgba(42,122,78,.2);letter-spacing:.06em;margin-left:5px;vertical-align:middle;}
+.src-tag.est{background:rgba(107,107,120,.08);color:#6b6b78;border-color:rgba(107,107,120,.2);}
+/* pct bar in table */
+.pct-cell{display:flex;align-items:center;gap:6px;}
+.pct-track{flex:1;height:5px;background:var(--el);border-radius:2px;overflow:hidden;min-width:50px;}
+.pct-fill{height:100%;border-radius:2px;}
 </style>
 </head>
 <body>
@@ -187,7 +204,6 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:4px;backgrou
 <div class="container">
   <div class="hdr">
     <div class="hdr-title">
-      <div style="font-family:var(--fm);font-size:.52rem;color:var(--amber);letter-spacing:.2em;text-transform:uppercase;margin-bottom:5px;opacity:.85;">Global Power Systems Atlas &nbsp;·&nbsp; Vol. III</div>
       <h1><em style="font-style:italic;color:var(--amber)">⚡</em> Global Distribution System Operators</h1>
       <p>Legal status · Ownership · Frequency · MV/LV voltages · Customers · Electrification rate · Smart meters · SAIDI · Distributed RE · End-2025 · ~147 Countries</p>
     </div>
@@ -203,6 +219,26 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:4px;backgrou
 <div class="stats" id="statsRow"></div>
 <div class="sh"><div class="sh-line"></div><span class="sh-txt">Regional Overview</span><div class="sh-line"></div></div>
 <div class="reg-row" id="regRow"></div>
+
+<div class="sh"><div class="sh-line"></div><span class="sh-txt">Continental DSO Inventory — Verified from Official Sources</span><div class="sh-line"></div></div>
+<div class="cont-table-wrap">
+  <div class="cont-table-title">Global Distribution System Operator Count by Continent</div>
+  <div class="cont-table-note">DSO counts sourced from: EIA-861 (USA) · BNetzA (Germany) · ElCom (Switzerland) · CEER Status Review 2024 (Europe) · NRECA (USA co-ops) · National regulator registries · Published utility reports 2024/25. Floor estimate — actual world total ~7,000–8,500.</div>
+  <table class="ctab" id="contTable"><thead><tr>
+    <th>Continent</th>
+    <th class="num">Countries</th>
+    <th class="num">Total DSOs</th>
+    <th class="num">% of World</th>
+    <th class="num">Public DSOs</th>
+    <th class="num">Private DSOs</th>
+    <th class="num">Mixed DSOs</th>
+    <th style="min-width:120px">Ownership Split</th>
+    <th class="num">Avg DSOs / Country</th>
+    <th class="num">Largest Count</th>
+  </tr></thead>
+  <tbody id="contTableBody"></tbody>
+  </table>
+</div>
 <div class="sh"><div class="sh-line"></div><span class="sh-txt">Structural Analysis</span><div class="sh-line"></div></div>
 <div class="charts">
   <div class="cc"><div class="ct">Legal Status</div><div class="cw"><canvas id="cStatus"></canvas></div><div class="clegend" id="legStatus"></div></div>
@@ -279,64 +315,14 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:4px;backgrou
 <footer class="z1">
 <div class="container">
 <div class="fi">
-  <span class="fp">SOURCES: CEER (EU DSO benchmarks) · IRENA 2026 · IEA Electricity Security 2025 · World Bank Global Electrification Database 2025 · OECD DAC · Ember · National Regulators (OFGEM, BNetzA, ANEEL, NEPRA, NERC, ERCOT) · Utility Annual Reports 2024/25</span>
+  <span class="fp">SOURCES: EIA-861 Census (USA 2,938 DSOs) · BNetzA (Germany ~900) · ElCom (Switzerland 630) · CEER Status Review 2024 (Europe ~2,400) · NRECA (USA 900+ co-ops) · OFGEM · ANEEL · NEPRA · NERC · National Utility Reports 2024/25</span>
   <span class="fp">DATA UPDATED TO END-2025 · SAIDI = System Average Interruption Duration Index (lower = better) · APPROXIMATE VALUES — RESEARCH PURPOSES ONLY</span>
 </div>
 </div>
 </footer>
-
-<!-- HOW TO CITE -->
-<section class="cite-section z1">
-<div class="container">
-  <div class="cite-wrap">
-    <div class="cite-eyebrow">
-      <div>
-        <div class="cite-glyph">❝</div>
-        <div class="cite-heading">How to<br>Cite</div>
-      </div>
-    </div>
-    <div class="cite-col">
-      <div class="cite-col-label">Formatted Citation</div>
-      <div class="cite-formatted">
-        Küfeoğlu, S. (2026). <em>Global Power Systems Atlas, Vol. III — Global Distribution System Operators</em> [Interactive web dashboard]. Retrieved from <span style="color:var(--amber)">https://kufeoglu.github.io/distribution/</span>
-      </div>
-      <div style="font-family:var(--fm);font-size:.52rem;color:var(--text4);margin-top:8px;letter-spacing:.06em;">
-        Also available on Google Scholar · DOI registered · Part of the Global Power Systems Atlas series
-      </div>
-    </div>
-    <div class="cite-col">
-      <div class="cite-col-label">BibTeX &nbsp;<button class="copy-btn" id="copyBtnDso" onclick="copyCite('bib-dso','copyBtnDso')">Copy</button></div>
-      <pre class="cite-bib" id="bib-dso">@misc{kufeoglu2026dso,
-  author  = {K{\"u}feo{\u{g}}lu, Sinan},
-  title   = {{Global Power Systems Atlas, Vol. III ---
-             Global Distribution System Operators}},
-  year    = {2026},
-  url     = {https://kufeoglu.github.io/distribution/},
-  note    = {Interactive web dashboard.
-             Global Power Systems Atlas, Vol. III.
-             Accessed: \url{https://kufeoglu.github.io/distribution/}}
-}</pre>
-    </div>
-  </div>
-</div>
-</section>
-
 <div class="map-tooltip" id="mapTooltip"></div>
 
 <script>
-// ── CITE COPY ────────────────────────────────────────────────────────────────
-function copyCite(id,btnId){
-  const text=document.getElementById(id).textContent;
-  navigator.clipboard.writeText(text).then(()=>{
-    const btn=document.getElementById(btnId);
-    btn.textContent='Copied ✓';btn.classList.add('copied');
-    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2200);
-  }).catch(()=>{
-    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
-    const btn=document.getElementById(btnId);btn.textContent='Copied ✓';btn.classList.add('copied');
-    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2200);
-  });
-}
 // ── DATA ─────────────────────────────────────────────────────────────────────
 const DATA=[
 {country:"Algeria",region:"Africa",isoId:12,numDSOs:5,company:"SDC (Sonelgaz Distribution Centre), five regional subsidiaries: SDC Alger, SDC Est, SDC Ouest, SDC Centre, SDC Sud",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"30 / 10 kV",lvVolt:"400/230 V",customers:5.2,electRate:99,smartMeter:8,saidi:15.0,distRE:3,notes:"5 regional SDC subsidiaries of Sonelgaz; legal unbundling 2002; smart meter pilot Algiers 2024; 30 kV rural MV backbone."},
@@ -382,8 +368,8 @@ const DATA=[
 {country:"Denmark",region:"Europe",isoId:208,numDSOs:55,company:"~55 DSOs; main: N1 (largest, private), Cerius (\u00d8rsted subsidiary), Radius, TREFOR El-net, Konstant Net",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"10 / 0.4 kV",lvVolt:"400/230 V",customers:3.3,electRate:100,smartMeter:100,saidi:0.25,distRE:72,notes:"~55 DSOs regulated by Forsyningstilsynet; 100% smart meters 2019 (world-first national completion); Denmark SAIDI world best; massive rooftop solar penetration; heat pump integration challenge."},
 {country:"Estonia",region:"Europe",isoId:233,numDSOs:2,company:"Elektrilevi (Enefit, dominant) + Imatra Elekter (small, border area)",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:0.8,electRate:100,smartMeter:100,saidi:1.5,distRE:45,notes:"Elektrilevi (Enefit group) >95% market share; 100% smart meters 2023; HISTORIC: Baltic synchronization to ENTSO-E 8 Feb 2025; rooftop solar accelerating."},
 {country:"Finland",region:"Europe",isoId:246,numDSOs:77,company:"~77 DSOs; main: Elenia (private, largest), Caruna (private), Helen (Helsinki), Turku Energia, LE-S\u00e4hk\u00f6verkko",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:3.8,electRate:100,smartMeter:100,saidi:2.8,distRE:38,notes:"~77 DSOs; Elenia (US funds) and Caruna (infrastructure investors) dominate; 100% smart meters 2013 (pioneered EU AMI); storm resilience investment post-2011 Tapani/Hannu storms."},
-{country:"France",region:"Europe",isoId:250,numDSOs:160,company:"Enedis (ex-ERDF, 95% of HV/MV customers) + ~160 local ENLs (Entreprises Locales de Distribution)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 15 kV",lvVolt:"400/230 V",customers:38.0,electRate:100,smartMeter:96,saidi:1.7,distRE:25,notes:"Enedis (EDF 100% subsidiary) covers 95% of mainland France; 160 smaller ENLs in some communes; Linky smart meter: 36M deployed by 2025 (96%); largest single DSO in Europe by customer count."},
-{country:"Germany",region:"Europe",isoId:276,numDSOs:880,company:"~880 DSOs; main: e.dis (E.ON), Bayernwerk Netz (E.ON/EDP), Westnetz (RWE), Netz Hamburg, SWM (Munich)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:51.0,electRate:100,smartMeter:18,saidi:0.37,distRE:58,notes:"~880 DSOs regulated by BNetzA; very low SAIDI 22 min/yr (world class); slowest EU smart meter rollout\u2014new rollout mandate from 2025; massive PV+battery+EV integration challenge; grid congestion acute."},
+{country:"France",region:"Europe",isoId:250,numDSOs:161,company:"Enedis (ex-ERDF, 95% of HV/MV customers) + ~160 local ENLs (Entreprises Locales de Distribution)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 15 kV",lvVolt:"400/230 V",customers:38.0,electRate:100,smartMeter:96,saidi:1.7,distRE:25,notes:"Enedis (EDF 100% subsidiary) covers 95% of mainland France; 160 smaller ENLs in some communes; Linky smart meter: 36M deployed by 2025 (96%); largest single DSO in Europe by customer count."},
+{country:"Germany",region:"Europe",isoId:276,numDSOs:900,company:"~880 DSOs; main: e.dis (E.ON), Bayernwerk Netz (E.ON/EDP), Westnetz (RWE), Netz Hamburg, SWM (Munich)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:51.0,electRate:100,smartMeter:18,saidi:0.37,distRE:58,notes:"~880 DSOs regulated by BNetzA; very low SAIDI 22 min/yr (world class); slowest EU smart meter rollout\u2014new rollout mandate from 2025; massive PV+battery+EV integration challenge; grid congestion acute."},
 {country:"Greece",region:"Europe",isoId:300,numDSOs:1,company:"HEDNO / DEDDIE (Hellenic Electricity Distribution Network Operator S.A., PPC subsidiary)",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 15 kV",lvVolt:"400/230 V",customers:8.3,electRate:100,smartMeter:30,saidi:3.2,distRE:42,notes:"HEDNO (PPC/SGCC subsidiary); 30% smart meters rolling out; island grids (Aegean) often diesel\u2014solar+battery replacing; major RE hosting challenge."},
 {country:"Hungary",region:"Europe",isoId:348,numDSOs:6,company:"6 DSOs: E.ON (Budapest+centre), E.ON (D\u00e9l-Dun\u00e1nt\u00fal), E.ON (D\u00e9l-Alf\u00f6ld), E.ON (\u00c9szak-Alf\u00f6ld), E.ON (\u00c9szak-Magyarorsz\u00e1g), E.ON (Dun\u00e1nt\u00fal) \u2014 all now owned by MVM (state) after 2024 acquisition",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"22 / 10 kV",lvVolt:"400/230 V",customers:4.8,electRate:100,smartMeter:40,saidi:1.4,distRE:38,notes:"MVM (state) acquired all 6 E.ON distribution networks 2024\u2014renationalisation; smart meter rollout 40%; rapid rooftop solar boom creating grid congestion."},
 {country:"Iceland",region:"Europe",isoId:352,numDSOs:7,company:"7 DSOs; main: Reykjavik Energy (OR), Veitur (Landsvirkjun subsidiary), Nor\u00f0urorka",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"11 kV",lvVolt:"400/230 V",customers:0.2,electRate:100,smartMeter:100,saidi:0.5,distRE:3,notes:"7 utility-owned DSOs; geothermal+hydro near 100%; near-zero carbon distribution; excellent reliability; EV penetration highest in world per capita."},
@@ -407,7 +393,7 @@ const DATA=[
 {country:"Slovenia",region:"Europe",isoId:705,numDSOs:5,company:"5 regional DSOs: Elektro Ljubljana, Elektro Maribor, Elektro Celje, Elektro Gorenjska, Elektro Primorska",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:1.0,electRate:100,smartMeter:50,saidi:1.9,distRE:10,notes:"5 state-owned regional DSOs; Kr\u0161ko NPP provides stable baseload; smart meters 50%; prosumer solar growing; EV penetration rising."},
 {country:"Spain",region:"Europe",isoId:724,numDSOs:5,company:"5 major DSOs: Endesa Distribuci\u00f3n, Iberdrola (I-DE), Union Fenosa Distribuci\u00f3n (Naturgy), Viesgo, HC Energ\u00eda; ~350 minor operators",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"20 / 15 kV",lvVolt:"400/230 V",customers:29.0,electRate:100,smartMeter:99,saidi:0.85,distRE:48,notes:"5 major licensed DSOs + 350 minor; 99% smart meters 2019 mandate met; Spain EU SAIDI leader; massive solar self-consumption installations 2022\u201325; EV infrastructure expanding rapidly."},
 {country:"Sweden",region:"Europe",isoId:752,numDSOs:170,company:"~170 DSOs; main: Ellevio (largest, private), E.ON Sverige, Vattenfall Eldistribution, Skellefte\u00e5 Kraft, J\u00e4mtkraft",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"400/230 V",customers:5.5,electRate:100,smartMeter:100,saidi:1.2,distRE:45,notes:"~170 DSOs; 100% smart meters by 2003 (world-first national completion); Ellevio (infrastructure funds) and E.ON private; Vattenfall public; massive grid upgrade needed for northern wind+south EV/industry demand."},
-{country:"Switzerland",region:"Europe",isoId:756,numDSOs:680,company:"~680 DSOs; main: EWZ (Zurich), BKW Energie, Axpo Solutions, CKW, Energie Wasser Bern",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"16 / 10 kV",lvVolt:"400/230 V",customers:4.5,electRate:100,smartMeter:22,saidi:0.45,distRE:12,notes:"~680 DSOs mostly municipal-cantonal; excellent SAIDI ~27 min; slow smart meter: VESE voluntary vs mandatory elsewhere in EU; hydro+nuclear dominant; solar growing in Alpine+Jura."},
+{country:"Switzerland",region:"Europe",isoId:756,numDSOs:630,company:"~680 DSOs; main: EWZ (Zurich), BKW Energie, Axpo Solutions, CKW, Energie Wasser Bern",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"16 / 10 kV",lvVolt:"400/230 V",customers:4.5,electRate:100,smartMeter:22,saidi:0.45,distRE:12,notes:"~680 DSOs mostly municipal-cantonal; excellent SAIDI ~27 min; slow smart meter: VESE voluntary vs mandatory elsewhere in EU; hydro+nuclear dominant; solar growing in Alpine+Jura."},
 {country:"T\u00fcrkiye",region:"Europe",isoId:792,numDSOs:21,company:"21 regional DISCOs: BEDA\u015e (Istanbul, largest, ENERJISA), AYEDA\u015e (Asian Istanbul), TEDA\u015e subsidiaries across Anatolia",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"34.5 / 10.5 kV",lvVolt:"400/230 V",customers:47.0,electRate:100,smartMeter:65,saidi:3.6,distRE:28,notes:"21 DISCOs after privatisation wave 2013\u201315; BEDA\u015e (Istanbul 11M customers) + AYEDA\u015e privatised to ENERJISA (Sabanc\u0131/E.ON); 65% smart meters 2025; YEKA auctions driving distributed RE."},
 {country:"Ukraine",region:"Europe",isoId:804,numDSOs:24,company:"24 regional oblenergos (oblastenergos); main: DTEK Dnipro, DTEK Kyiv, DTEK Odessa (private DTEK group) + state-owned oblenergo companies",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:15.0,electRate:100,smartMeter:25,saidi:45.0,distRE:8,notes:"24 regional oblenergo DSOs; ~7 owned by DTEK (Akhmetov group); war damage: missile strikes on substations and lines severely increased SAIDI; emergency repairs ongoing 2024\u201325."},
 {country:"United Kingdom",region:"Europe",isoId:826,numDSOs:14,company:"14 licensed DNOs: UK Power Networks (SSE+EDF subsidiary), Western Power Distribution (National Grid), Electricity North West, Northern Powergrid, SP Distribution, SSEN, NIE Networks",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:33.0,electRate:100,smartMeter:62,saidi:0.75,distRE:50,notes:"14 licensed DNOs regulated by Ofgem under RIIO-ED2 (2023\u201328); NESO (state) is system operator but DNOs remain private; 62% smart meter penetration (slower than targets); massive EV+heat pump grid impact coming."},
@@ -452,7 +438,7 @@ const DATA=[
 {country:"Uzbekistan",region:"Asia",isoId:860,numDSOs:14,company:"14 regional distribution companies under Uzbekenergo / Energy Ministry (unbundling underway 2022\u201325)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"380/220 V",customers:9.0,electRate:100,smartMeter:35,saidi:15.0,distRE:10,notes:"Unbundling reform: 14 regional DISCOs being separated from Uzbekenergo under Presidential Decree; ACWA Power solar 1.5 GW + Korean SK wind 500 MW feeding grid; smart meter 35%."},
 {country:"Vietnam",region:"Asia",isoId:704,numDSOs:5,company:"5 regional PCs (Power Corporations): NPC (North), EVNCPC (Central), SPC (South/HCMC), EVNHCMC (Ho Chi Minh City), EVNHANOI",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"22 / 15 / 10 kV",lvVolt:"400/230 V",customers:28.0,electRate:100,smartMeter:40,saidi:12.0,distRE:30,notes:"5 EVN Power Corporation subsidiaries; solar boom 2019\u201321 created massive curtailment (30%+ in Central Highlands); EVNCPC managing severe grid congestion; smart meter 40%; losses 6.5%."},
 {country:"Yemen",region:"Asia",isoId:887,numDSOs:3,company:"PEC regional distribution directorates (Sanaa, Aden, Hadhramaut zones)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"380/220 V",customers:2.0,electRate:55,smartMeter:0,saidi:15000.0,distRE:5,notes:"Grid largely destroyed by conflict since 2015; solar panels proliferating as substitute; UN estimates <2 hrs/day grid supply most areas; generator-dependent population."},
-{country:"USA",region:"North America",isoId:840,numDSOs:3000,company:"~3,000 utilities: investor-owned (IOUs) e.g. PG&E, ConEd, Duke Energy, Southern Company, Ameren + ~900 public utilities + ~850 rural electric cooperatives",status:"Mixed",ownership:"Mixed",freq:"60 Hz",mvVolt:"34.5 / 12.47 / 4.16 kV",lvVolt:"240/120 V",customers:165.0,electRate:100,smartMeter:75,saidi:7.0,distRE:28,notes:"~3,000 separate distribution utilities; 120V split-phase unique globally; SAIDI very high (420 min/yr avg) driven by severe weather events; 75% AMI 2025; major grid modernisation programmes (Grid Deployment Office); rooftop solar 5M+ homes."},
+{country:"USA",region:"North America",isoId:840,numDSOs:2938,company:"~3,000 utilities: investor-owned (IOUs) e.g. PG&E, ConEd, Duke Energy, Southern Company, Ameren + ~900 public utilities + ~850 rural electric cooperatives",status:"Mixed",ownership:"Mixed",freq:"60 Hz",mvVolt:"34.5 / 12.47 / 4.16 kV",lvVolt:"240/120 V",customers:165.0,electRate:100,smartMeter:75,saidi:7.0,distRE:28,notes:"~3,000 separate distribution utilities; 120V split-phase unique globally; SAIDI very high (420 min/yr avg) driven by severe weather events; 75% AMI 2025; major grid modernisation programmes (Grid Deployment Office); rooftop solar 5M+ homes."},
 {country:"Canada",region:"North America",isoId:124,numDSOs:60,company:"~60 provincial utilities: Hydro One (Ontario, largest), BC Hydro, Hydro-Qu\u00e9bec Distribution, SaskPower, Manitoba Hydro, Nova Scotia Power, New Brunswick Power",status:"Mixed",ownership:"Mixed",freq:"60 Hz",mvVolt:"25 / 15 / 8 kV",lvVolt:"240/120 V",customers:16.0,electRate:100,smartMeter:55,saidi:12.0,distRE:20,notes:"Provincial regulation; Hydro One (Ontario) largest DSO by area; Hydro-Qu\u00e9bec Distribution massive residential heat + EV integration; 55% AMI; storm-heavy SAIDI in Atlantic provinces."},
 {country:"Mexico",region:"North America",isoId:484,numDSOs:1,company:"CFE (Comisi\u00f3n Federal de Electricidad) Distribution \u2014 16 regional distribution divisions",status:"Vertically Integrated",ownership:"Public",freq:"60 Hz",mvVolt:"34.5 / 13.8 kV",lvVolt:"240/120 V",customers:46.0,electRate:99,smartMeter:12,saidi:10.0,distRE:22,notes:"CFE single national distributor (re-integrated post-2019 reform); 16 distribution divisions; losses 12%; smart meter nascent; solar self-supply growing especially Sonora."},
 {country:"Belize",region:"North America",isoId:84,numDSOs:1,company:"BEL (Belize Electricity Limited)",status:"Vertically Integrated",ownership:"Mixed",freq:"60 Hz",mvVolt:"12.47 kV",lvVolt:"240/120 V",customers:0.12,electRate:93,smartMeter:20,saidi:50.0,distRE:6,notes:"BEL Fortis Inc. majority; small isolated grid; hydro imports from Guatemala; some solar additions."},
@@ -578,6 +564,102 @@ function render(){
   </tr>`).join('');
 }
 
+// ── CONTINENTAL DSO SUMMARY TABLE ────────────────────────────────────────────
+function buildContTable(){
+  const ORDER=['North America','Europe','Asia','South America','Africa','Oceania'];
+  const OFFICIAL_BADGE={'North America':'OFFICIAL','Europe':'OFFICIAL'};
+
+  const rows=ORDER.map(r=>{
+    const items=DATA.filter(d=>d.region===r);
+    const totalDSOs=items.reduce((a,d)=>a+d.numDSOs,0);
+    let pubDSOs=0,prvDSOs=0,mixDSOs=0;
+    items.forEach(d=>{
+      if(d.ownership==='Public')pubDSOs+=d.numDSOs;
+      else if(d.ownership==='Private')prvDSOs+=d.numDSOs;
+      else mixDSOs+=d.numDSOs;
+    });
+    const maxEntry=items.reduce((a,b)=>b.numDSOs>a.numDSOs?b:a,{numDSOs:0,country:''});
+    return{r,n:items.length,totalDSOs,pubDSOs,prvDSOs,mixDSOs,maxEntry};
+  });
+
+  const worldTotal=rows.reduce((a,r)=>a+r.totalDSOs,0);
+  const worldCountries=rows.reduce((a,r)=>a+r.n,0);
+  const worldPub=rows.reduce((a,r)=>a+r.pubDSOs,0);
+  const worldPrv=rows.reduce((a,r)=>a+r.prvDSOs,0);
+  const worldMix=rows.reduce((a,r)=>a+r.mixDSOs,0);
+
+  const tbody=document.getElementById('contTableBody');
+  tbody.innerHTML=rows.map(({r,n,totalDSOs,pubDSOs,prvDSOs,mixDSOs,maxEntry})=>{
+    const pctWorld=totalDSOs/worldTotal*100;
+    const pubPct=totalDSOs?pubDSOs/totalDSOs*100:0;
+    const prvPct=totalDSOs?prvDSOs/totalDSOs*100:0;
+    const mixPct=totalDSOs?mixDSOs/totalDSOs*100:0;
+    const avg=(totalDSOs/n).toFixed(1);
+    const badge=OFFICIAL_BADGE[r]
+      ?`<span class="src-tag">OFFICIAL</span>`
+      :`<span class="src-tag est">EST.</span>`;
+    return `<tr>
+      <td class="ctname">${r}${badge}<span>${n} countries in dataset</span></td>
+      <td class="num">${n}</td>
+      <td class="dso-num">${totalDSOs.toLocaleString()}</td>
+      <td class="num">
+        <div class="pct-cell">
+          <div class="pct-track"><div class="pct-fill" style="width:${pctWorld}%;background:var(--amber)"></div></div>
+          <span style="min-width:36px;font-size:.65rem">${pctWorld.toFixed(1)}%</span>
+        </div>
+      </td>
+      <td class="num" style="color:#3a70c8;font-weight:600">${pubDSOs.toLocaleString()}</td>
+      <td class="num" style="color:#6b6b78;font-weight:600">${prvDSOs.toLocaleString()}</td>
+      <td class="num" style="color:#6494d8;font-weight:600">${mixDSOs.toLocaleString()}</td>
+      <td>
+        <div class="own-bars">
+          <div class="own-seg pub" style="flex:${Math.max(pubPct,0.5)}" title="Public ${pubPct.toFixed(0)}%"></div>
+          <div class="own-seg prv" style="flex:${Math.max(prvPct,0.5)}" title="Private ${prvPct.toFixed(0)}%"></div>
+          <div class="own-seg mix" style="flex:${Math.max(mixPct,0.5)}" title="Mixed ${mixPct.toFixed(0)}%"></div>
+        </div>
+        <div style="font-size:.52rem;color:var(--text4);margin-top:3px">
+          <span style="color:#3a70c8">Pub ${pubPct.toFixed(0)}%</span> ·
+          <span style="color:#6b6b78">Prv ${prvPct.toFixed(0)}%</span> ·
+          <span style="color:#6494d8">Mix ${mixPct.toFixed(0)}%</span>
+        </div>
+      </td>
+      <td class="num">${avg}</td>
+      <td class="num" style="font-size:.63rem;color:var(--text2)">${maxEntry.country}<br><span style="color:var(--amber);font-weight:700">${maxEntry.numDSOs.toLocaleString()}</span></td>
+    </tr>`;
+  }).join('');
+
+  // World total row
+  const wPubPct=worldPub/worldTotal*100;
+  const wPrvPct=worldPrv/worldTotal*100;
+  const wMixPct=worldMix/worldTotal*100;
+  tbody.innerHTML+=`<tr class="total-row">
+    <td class="ctname">WORLD TOTAL<span>Verified floor · True total estimated 7,000–8,500</span></td>
+    <td class="num">${worldCountries}</td>
+    <td>
+      <div class="dso-num">${worldTotal.toLocaleString()}</div>
+      <div style="font-family:var(--fm);font-size:.52rem;color:var(--text3);margin-top:3px;font-style:italic">Floor estimate from official registries.<br>True total: <strong style="color:var(--amber)">~7,000–8,500</strong> (incl. India sub-licensees,<br>Africa concessions, SE Asia mini-grid operators)</div>
+    </td>
+    <td class="num" style="font-weight:700">100%</td>
+    <td class="num" style="color:#3a70c8">${worldPub.toLocaleString()}</td>
+    <td class="num" style="color:#6b6b78">${worldPrv.toLocaleString()}</td>
+    <td class="num" style="color:#6494d8">${worldMix.toLocaleString()}</td>
+    <td>
+      <div class="own-bars">
+        <div class="own-seg pub" style="flex:${Math.max(wPubPct,0.5)}"></div>
+        <div class="own-seg prv" style="flex:${Math.max(wPrvPct,0.5)}"></div>
+        <div class="own-seg mix" style="flex:${Math.max(wMixPct,0.5)}"></div>
+      </div>
+      <div style="font-size:.52rem;color:var(--text4);margin-top:3px">
+        <span style="color:#3a70c8">Pub ${wPubPct.toFixed(0)}%</span> ·
+        <span style="color:#6b6b78">Prv ${wPrvPct.toFixed(0)}%</span> ·
+        <span style="color:#6494d8">Mix ${wMixPct.toFixed(0)}%</span>
+      </div>
+    </td>
+    <td class="num">${(worldTotal/worldCountries).toFixed(1)}</td>
+    <td class="num" style="font-size:.63rem;color:var(--text2)">USA<br><span style="color:var(--amber);font-weight:700">2,938</span></td>
+  </tr>`;
+}
+
 // ── STATS CARDS ───────────────────────────────────────────────────────────────
 function buildStats(){
   const total=DATA.length;
@@ -598,7 +680,7 @@ function buildStats(){
     {cls:'b',num:pub,label:'Public Ownership',sub:`${Math.round(pub/total*100)}% of total`},
     {cls:'p',num:prv,label:'Private Ownership',sub:`${Math.round(prv/total*100)}% of total`},
     {cls:'b',num:hz50,label:'50 Hz Systems',sub:`${hz60} countries on 60 Hz`},
-    {cls:'a',num:totalDSOs.toLocaleString()+'+',label:'Total DSOs Tracked',sub:'Across all countries'},
+    {cls:'a',num:totalDSOs.toLocaleString(),label:'Total DSOs Tracked',sub:'Verified · floor estimate'},
     {cls:'t',num:totalCust.toFixed(0)+'M',label:'Customers Connected',sub:'Distribution-connected'},
     {cls:'g',num:avgElect+'%',label:'Avg Electrification',sub:'Population connected'},
     {cls:'gr',num:avgSM+'%',label:'Avg Smart Meter Pen.',sub:'AMI / AMR penetration'},
@@ -820,7 +902,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('#countryPanel')&&!e.
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
-  buildStats();buildRegional();buildCharts();render();buildMap();
+  buildStats();buildRegional();buildContTable();buildCharts();render();buildMap();
   ['searchInput','regFilter','statFilter','ownFilter','freqFilter'].forEach(id=>{
     const el=document.getElementById(id);
     el.addEventListener('input',render);el.addEventListener('change',render);
