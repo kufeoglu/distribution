@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Global Distribution System Operators Dashboard</title>
+<title>Global Power Systems Atlas · Vol. III — Global Distribution System Operators</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
@@ -164,7 +164,20 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:4px;backgrou
 .fp{font-family:var(--fm);font-size:.54rem;color:var(--text4);letter-spacing:.1em;font-style:italic;}
 ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#c9bfa6;border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:var(--amber);}
 @media(max-width:1100px){.charts{grid-template-columns:1fr 1fr;}.charts .cc:last-child{grid-column:1/-1;}}
-@media(max-width:700px){.charts{grid-template-columns:1fr;}.charts .cc:last-child{grid-column:auto;}.hdr-title h1{font-size:1.7rem;}.country-panel{width:100%;}}
+@media(max-width:700px){.charts{grid-template-columns:1fr;}.charts .cc:last-child{grid-column:auto;}.hdr-title h1{font-size:1.7rem;}.country-panel{width:100%;}.cite-wrap{grid-template-columns:1fr;}.cite-eyebrow{border-right:none;border-bottom:1px solid var(--border);padding-right:0;padding-bottom:14px;}}
+/* CITE SECTION */
+.cite-section{background:var(--card);border-top:2px solid var(--border);padding:22px 0 20px;}
+.cite-wrap{display:grid;grid-template-columns:auto 1fr 1fr;align-items:start;gap:24px;}
+.cite-eyebrow{display:flex;align-items:center;gap:10px;padding-right:24px;border-right:1px solid var(--border);}
+.cite-glyph{font-family:var(--fs);font-size:2rem;color:var(--amber);line-height:1;font-style:italic;}
+.cite-heading{font-family:var(--fm);font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);white-space:nowrap;margin-top:4px;}
+.cite-col-label{font-family:var(--fm);font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:7px;display:flex;align-items:center;gap:8px;}
+.cite-formatted{font-family:var(--fb);font-size:.75rem;color:var(--text2);line-height:1.65;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px 14px;}
+.cite-formatted em{font-style:italic;color:var(--text);}
+.cite-bib{font-family:var(--fm);font-size:.65rem;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px 14px;white-space:pre;overflow-x:auto;line-height:1.7;margin:0;}
+.copy-btn{font-family:var(--fm);font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;background:var(--bg);border:1px solid var(--border);color:var(--text3);padding:2px 8px;border-radius:3px;cursor:pointer;transition:all .14s;}
+.copy-btn:hover{border-color:var(--bdhi);color:var(--amber);}
+.copy-btn.copied{background:rgba(42,122,78,.07);border-color:rgba(42,122,78,.3);color:var(--green);}
 
 /* CONTINENTAL DSO SUMMARY TABLE */
 .cont-table-wrap{background:var(--card);border:1px solid var(--border);border-radius:4px;box-shadow:0 1px 4px rgba(26,22,18,.06);overflow-x:auto;margin-bottom:14px;}
@@ -197,6 +210,50 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:4px;backgrou
 .pct-cell{display:flex;align-items:center;gap:6px;}
 .pct-track{flex:1;height:5px;background:var(--el);border-radius:2px;overflow:hidden;min-width:50px;}
 .pct-fill{height:100%;border-radius:2px;}
+
+/* TERMINOLOGY / MODEL TABLE — DSO version */
+.term-intro{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:14px 18px;margin-bottom:12px;box-shadow:0 1px 4px rgba(26,22,18,.06);}
+.term-intro p{font-family:var(--fb);font-size:.78rem;color:var(--text2);line-height:1.55;}
+.term-intro p+p{margin-top:8px;}
+.term-intro strong{font-family:var(--fm);color:var(--amber);font-size:.7rem;letter-spacing:.05em;}
+.term-intro .term-glossary{margin-top:10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;padding-top:10px;border-top:1px dashed var(--border);}
+.term-glossary .term-item{font-family:var(--fm);font-size:.62rem;color:var(--text2);line-height:1.45;}
+.term-glossary .term-item b{color:var(--amber);font-weight:600;letter-spacing:.04em;}
+.term-table-wrap{background:var(--card);border:1px solid var(--border);border-radius:4px;box-shadow:0 1px 4px rgba(26,22,18,.06);overflow-x:auto;margin-bottom:14px;}
+.term-table-title{font-family:var(--fm);font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding:14px 18px 0;display:flex;align-items:center;gap:6px;}
+.term-table-title::before{content:'';width:2px;height:9px;background:var(--amber);border-radius:1px;flex-shrink:0;}
+.term-table-note{font-family:var(--fm);font-size:.54rem;color:var(--text4);padding:4px 18px 12px;font-style:italic;}
+.termtab{width:100%;border-collapse:collapse;font-family:var(--fm);font-size:.66rem;}
+.termtab thead th{background:var(--el);padding:9px 12px;text-align:left;font-size:.54rem;letter-spacing:.13em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap;font-weight:500;vertical-align:bottom;}
+.termtab thead th.num{text-align:right;}
+.termtab tbody tr{border-bottom:1px solid var(--border);transition:background .12s;vertical-align:top;}
+.termtab tbody tr:hover{background:var(--hov);}
+.termtab td{padding:10px 12px;color:var(--text2);vertical-align:top;line-height:1.5;}
+.termtab td.num{text-align:right;font-weight:500;font-size:.95rem;color:var(--amber);}
+.termtab td.model-name{color:var(--text);font-weight:600;font-size:.72rem;}
+.termtab td.model-name span{display:block;font-size:.55rem;color:var(--text3);font-weight:400;margin-top:2px;letter-spacing:.06em;text-transform:uppercase;}
+.termtab td.examples{font-size:.62rem;color:var(--text3);}
+.termtab td.duty{font-size:.6rem;}
+.duty-badge{display:inline-block;font-family:var(--fm);font-size:.55rem;padding:2px 6px;border-radius:3px;letter-spacing:.05em;font-weight:600;text-transform:uppercase;margin-right:3px;margin-bottom:2px;}
+.duty-op{background:rgba(58,112,200,.08);color:#3a70c8;border:1px solid rgba(58,112,200,.28);}
+.duty-ow{background:rgba(184,56,56,.08);color:#b83838;border:1px solid rgba(184,56,56,.28);}
+.duty-both{background:rgba(42,122,78,.08);color:#2a7a4e;border:1px solid rgba(42,122,78,.28);}
+.duty-retail{background:rgba(139,30,44,.08);color:#8b1e2c;border:1px solid rgba(139,30,44,.28);}
+.duty-flex{background:rgba(100,148,216,.08);color:#3a70c8;border:1px solid rgba(100,148,216,.28);}
+/* UK callout for DNO groups */
+.uk-callout{background:linear-gradient(135deg,rgba(139,30,44,.04),rgba(58,112,200,.04));border:1px solid var(--bdhi);border-radius:4px;padding:14px 18px;margin-bottom:12px;}
+.uk-callout-title{font-family:var(--fs);font-size:1rem;font-weight:700;color:var(--amber);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.uk-callout-title::before{content:'⚡';font-size:.95rem;}
+.uk-callout p{font-family:var(--fb);font-size:.72rem;color:var(--text2);line-height:1.55;}
+.uk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:10px;}
+.uk-cell{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:8px 10px;}
+.uk-cell-title{font-family:var(--fm);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;}
+.uk-cell-name{font-family:var(--fm);font-size:.7rem;color:var(--text);font-weight:600;line-height:1.3;}
+.uk-cell-sub{font-family:var(--fm);font-size:.55rem;color:var(--text3);margin-top:3px;line-height:1.35;}
+.uk-cell-tag{display:inline-block;font-family:var(--fm);font-size:.5rem;padding:1px 5px;border-radius:2px;letter-spacing:.06em;margin-top:4px;font-weight:600;}
+.uk-cell-tag.lic{background:rgba(58,112,200,.08);color:#3a70c8;border:1px solid rgba(58,112,200,.25);}
+.uk-cell-tag.grp{background:rgba(184,56,56,.08);color:#b83838;border:1px solid rgba(184,56,56,.25);}
+.uk-cell-tag.idno{background:rgba(107,107,120,.08);color:#6b6b78;border:1px solid rgba(107,107,120,.25);}
 </style>
 </head>
 <body>
@@ -204,12 +261,14 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:4px;backgrou
 <div class="container">
   <div class="hdr">
     <div class="hdr-title">
+      <div style="font-family:var(--fm);font-size:.52rem;color:var(--amber);letter-spacing:.2em;text-transform:uppercase;margin-bottom:5px;opacity:.85;">Global Power Systems Atlas &nbsp;·&nbsp; Vol. III</div>
       <h1><em style="font-style:italic;color:var(--amber)">⚡</em> Global Distribution System Operators</h1>
       <p>Legal status · Ownership · Frequency · MV/LV voltages · Customers · Electrification rate · Smart meters · SAIDI · Distributed RE · End-2025 · ~147 Countries</p>
     </div>
     <div class="hdr-right">
       <span class="live-badge"><span class="dot"></span>REFERENCE DATABASE</span>
       <span class="hl-badge">~147 COUNTRIES</span>
+      <span class="hl-badge">S. KÜFEOĞLU · 2026</span>
     </div>
   </div>
 </div>
@@ -239,6 +298,100 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:4px;backgrou
   <tbody id="contTableBody"></tbody>
   </table>
 </div>
+
+<!-- DSO TERMINOLOGY / OPERATOR vs OWNER vs RETAILER DISTINCTION -->
+<div class="sh"><div class="sh-line"></div><span class="sh-txt">DSO, DNO, DISCOM, IOU — Terminology & Duties Around the World</span><div class="sh-line"></div></div>
+<div class="term-intro">
+  <p><strong>WHY THIS MATTERS.</strong> "DSO" (Distribution System Operator) is a European Union legal term defined under the Electricity Directives — the operator of the medium- and low-voltage network that delivers power from the transmission grid to end customers. The rest of the world uses different names for the same job — <em>and</em> the bundle of duties varies sharply. Some "DSOs" only operate the wires; others own them, bill customers, set retail tariffs, run flexibility markets, and procure power. Counting "DSOs" alone hides this.</p>
+  <p>Unlike at transmission level, distribution operators almost always <em>own</em> the assets they operate (local-monopoly economics). The interesting splits at the distribution layer are: <strong>(1)</strong> wires-only vs. wires+retail bundled; <strong>(2)</strong> ownership type (state, municipal, investor, cooperative); <strong>(3)</strong> the emerging DNO→DSO transformation as networks become "smart" with EVs, rooftop solar, batteries, and demand response.</p>
+  <div class="term-glossary">
+    <div class="term-item"><b>DSO</b> Distribution System Operator (EU) — operates and usually owns the MV/LV network. Now also expected to procure local flexibility services.</div>
+    <div class="term-item"><b>DNO</b> Distribution Network Operator (UK) — historic term: owns and operates the wires only. Currently transitioning into a wider "DSO" role under Ofgem RIIO-ED2 (2023–28).</div>
+    <div class="term-item"><b>IDNO</b> Independent Distribution Network Operator (UK) — smaller licensed operators serving new build sites (housing developments, business parks). ~10 main groups in GB.</div>
+    <div class="term-item"><b>DISCOM</b> Distribution Company (India) — ~70 state-government-owned utilities; do wires + retail + tariff setting. Heavy AT&C losses in many states.</div>
+    <div class="term-item"><b>DISCO</b> Distribution Company (MENA / South Asia / Africa) — generic acronym used in Egypt (8), Iraq (18), Iran (39), Pakistan (11), Nigeria (11), Türkiye (21).</div>
+    <div class="term-item"><b>IOU</b> Investor-Owned Utility (USA) — privately owned, regulated by state PUCs. ~170 IOUs; serve ~70% of US customers (PG&E, Duke, ConEd, etc.).</div>
+    <div class="term-item"><b>POU / Municipal</b> Publicly Owned Utility — community-owned (city/county). USA: ~2,000 (LADWP, SMUD, NYPA). EU: Stadtwerke (Germany ~800).</div>
+    <div class="term-item"><b>Co-op</b> Rural Electric Cooperative — member-owned, mainly rural. USA: ~900 (NRECA), 56% of US land area. Bangladesh: ~80 PBSs.</div>
+    <div class="term-item"><b>DNSP</b> Distribution Network Service Provider (Australia) — 13 in NEM + Western Power in WEM. Mix of state-owned and private.</div>
+    <div class="term-item"><b>LDC</b> Local Distribution Company (Canada) — ~60 in Ontario alone (Hydro One Networks largest), provincially regulated.</div>
+    <div class="term-item"><b>Concessionária</b> Distribution Concessionaire (Brazil) — 53 concessions awarded by ANEEL; mix of private (Enel, EDP, Equatorial) and state.</div>
+    <div class="term-item"><b>Stadtwerke</b> Municipal utility (Germany) — ~800+ local utilities, often vertically bundling distribution + retail + heat + water + sometimes generation.</div>
+  </div>
+</div>
+
+<!-- UK SPECIAL CALLOUT — 14 DNOs, 6 groups -->
+<div class="uk-callout">
+  <div class="uk-callout-title">Worked example: Great Britain — 14 DNO licences, 6 corporate groups, 1 nation in transition</div>
+  <p>Ofgem licences <strong>14 Distribution Network Operator areas</strong> in Great Britain — but they're owned by just <strong>six corporate groups</strong>. Each group's licences are operated as a single business with shared boards, control rooms, and price controls (RIIO-ED2 covers 2023–2028). Ofgem deliberately keeps the licence count high to allow benchmarking ("if SSEN can hit this target, why can't Northern Powergrid?"), while the corporate consolidation reflects scale economies. Northern Ireland has its own separate DNO (NIE Networks, owned by Irish state utility ESB). Add ~10 main IDNOs (Independent DNOs) serving new-build housing and commercial sites, and a wider DNO→DSO transformation programme that is fundamentally changing what these companies <em>do</em>.</p>
+  <div class="uk-grid">
+    <div class="uk-cell">
+      <div class="uk-cell-title">Group #1 — UK Power Networks</div>
+      <div class="uk-cell-name">3 licences (LPN, SPN, EPN)</div>
+      <div class="uk-cell-sub">London + South East + East England. Owned by consortium of CKI/CKHI (Hong Kong) + Power Assets. ~8.4M customers — largest DNO group by customers.</div>
+      <span class="uk-cell-tag lic">3 LICENCES</span><span class="uk-cell-tag grp">PRIVATE</span>
+    </div>
+    <div class="uk-cell">
+      <div class="uk-cell-title">Group #2 — National Grid Electricity Distribution</div>
+      <div class="uk-cell-name">4 licences (formerly WPD)</div>
+      <div class="uk-cell-sub">East Midlands + West Midlands + South Wales + South West. Acquired by National Grid plc from PPL Corp (US) in 2021 for £7.8bn. Largest by area.</div>
+      <span class="uk-cell-tag lic">4 LICENCES</span><span class="uk-cell-tag grp">LISTED</span>
+    </div>
+    <div class="uk-cell">
+      <div class="uk-cell-title">Group #3 — Northern Powergrid</div>
+      <div class="uk-cell-name">2 licences (Yorkshire, North East)</div>
+      <div class="uk-cell-sub">Yorkshire + North East England. Owned by Berkshire Hathaway Energy (Warren Buffett's holding company).</div>
+      <span class="uk-cell-tag lic">2 LICENCES</span><span class="uk-cell-tag grp">PRIVATE</span>
+    </div>
+    <div class="uk-cell">
+      <div class="uk-cell-title">Group #4 — Electricity North West</div>
+      <div class="uk-cell-name">1 licence (NW England)</div>
+      <div class="uk-cell-sub">North West England — Manchester, Liverpool, Cumbria. Owned by consortium of First Sentier Investors + Equitix infrastructure funds.</div>
+      <span class="uk-cell-tag lic">1 LICENCE</span><span class="uk-cell-tag grp">PRIVATE</span>
+    </div>
+    <div class="uk-cell">
+      <div class="uk-cell-title">Group #5 — SP Energy Networks</div>
+      <div class="uk-cell-name">2 licences (SP Distribution, SP Manweb)</div>
+      <div class="uk-cell-sub">Central Scotland + Merseyside/N.Wales/Cheshire. ScottishPower subsidiary, ultimately owned by Iberdrola (Spain).</div>
+      <span class="uk-cell-tag lic">2 LICENCES</span><span class="uk-cell-tag grp">LISTED PARENT</span>
+    </div>
+    <div class="uk-cell">
+      <div class="uk-cell-title">Group #6 — SSEN Distribution</div>
+      <div class="uk-cell-name">2 licences (SHEPD, SEPD)</div>
+      <div class="uk-cell-sub">Northern Scotland + Southern England (Hampshire, Berkshire, Oxfordshire, etc.). Subsidiary of SSE plc (LSE-listed).</div>
+      <span class="uk-cell-tag lic">2 LICENCES</span><span class="uk-cell-tag grp">LISTED PARENT</span>
+    </div>
+    <div class="uk-cell">
+      <div class="uk-cell-title">+ Northern Ireland (separate)</div>
+      <div class="uk-cell-name">NIE Networks</div>
+      <div class="uk-cell-sub">All of NI distribution. Owned by ESB (Irish state). Operates in the all-island Irish synchronous grid (not GB).</div>
+      <span class="uk-cell-tag lic">1 LICENCE</span><span class="uk-cell-tag grp">FOREIGN STATE</span>
+    </div>
+    <div class="uk-cell">
+      <div class="uk-cell-title">+ IDNOs</div>
+      <div class="uk-cell-name">~10 main IDNO groups</div>
+      <div class="uk-cell-sub">Energetics, GTC, ESP Electricity, Eclipse, Last Mile, Vattenfall IDNO etc. Serve new housing/commercial sites — own and operate "last mile" connections within otherwise DNO areas.</div>
+      <span class="uk-cell-tag idno">SPECIALIST</span>
+    </div>
+  </div>
+</div>
+
+<div class="term-table-wrap">
+  <div class="term-table-title">Institutional Models for Distribution — Operators, Owners, Retail and Ownership Worldwide</div>
+  <div class="term-table-note">Compiled from: CEER Status Review of Distribution 2024 (EU) · Ofgem RIIO-ED2 (UK) · EIA-861 census (USA) · Forum of Indian Regulators (India DISCOMs) · ANEEL (Brazil) · AEMO/AER (Australia) · NRECA + APPA (US ownership categories) · National regulator registries 2024/25.</div>
+  <table class="termtab">
+    <thead><tr>
+      <th style="min-width:140px">Model & Acronym</th>
+      <th style="min-width:215px">Definition & Legal Basis</th>
+      <th class="num"># of Entities</th>
+      <th style="min-width:175px">Duties Bundled</th>
+      <th style="min-width:200px">Typical Ownership</th>
+      <th style="min-width:225px">Country Examples</th>
+    </tr></thead>
+    <tbody id="termTableBody"></tbody>
+  </table>
+</div>
+
 <div class="sh"><div class="sh-line"></div><span class="sh-txt">Structural Analysis</span><div class="sh-line"></div></div>
 <div class="charts">
   <div class="cc"><div class="ct">Legal Status</div><div class="cw"><canvas id="cStatus"></canvas></div><div class="clegend" id="legStatus"></div></div>
@@ -320,6 +473,52 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:4px;backgrou
 </div>
 </div>
 </footer>
+
+<!-- HOW TO CITE -->
+<section class="cite-section">
+<div class="container">
+  <div class="cite-wrap">
+    <div class="cite-eyebrow">
+      <div><div class="cite-glyph">❝</div><div class="cite-heading">How to<br>Cite</div></div>
+    </div>
+    <div>
+      <div class="cite-col-label">Formatted Citation</div>
+      <div class="cite-formatted">
+        Küfeoğlu, S. (2026). <em>Global Power Systems Atlas, Vol. III — Global Distribution System Operators</em> [Interactive web dashboard]. Retrieved from <span style="color:var(--amber)">https://kufeoglu.github.io/distribution/</span>
+      </div>
+      <div style="font-family:var(--fm);font-size:.52rem;color:var(--text4);margin-top:8px;letter-spacing:.06em;">Also available on Google Scholar · DOI registered · Part of the Global Power Systems Atlas series</div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px 14px;margin-top:10px;">
+        <div style="font-family:var(--fm);font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:8px;">Full Series</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div style="font-family:var(--fm);font-size:.62rem;color:var(--text2);">Vol. I &nbsp;— Global Transmission System Operators &nbsp;<span style="color:var(--text3)">kufeoglu.github.io/transmission/</span></div>
+          <div style="font-family:var(--fm);font-size:.62rem;color:var(--text2);">Vol. II &nbsp;— PS-RIQ: Regulatory &amp; Institutional Quality Index &nbsp;<span style="color:var(--text3)">kufeoglu.github.io/regulators/</span></div>
+          <div style="font-family:var(--fm);font-size:.62rem;color:var(--text);font-weight:600;">Vol. III — Global Distribution System Operators &nbsp;<span style="color:var(--amber)">kufeoglu.github.io/distribution/</span></div>
+          <div style="font-family:var(--fm);font-size:.62rem;color:var(--text2);">Vol. IV — Global Electricity Markets &nbsp;<span style="color:var(--text3)">kufeoglu.github.io/markets/</span></div>
+          <div style="font-family:var(--fm);font-size:.62rem;color:var(--text2);">Vol. V &nbsp;— Global Energy Storage &amp; Flexibility &nbsp;<span style="color:var(--text3)">kufeoglu.github.io/storage/</span></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="cite-col-label">BibTeX &nbsp;<button class="copy-btn" id="copyBtnV3" onclick="copyCite('bib-v3','copyBtnV3')">Copy</button></div>
+      <pre class="cite-bib" id="bib-v3">@misc{kufeoglu2026distribution,
+  author  = {K{\"u}feo{\u{g}}lu, Sinan},
+  title   = {{Global Power Systems Atlas, Vol. III ---
+             Global Distribution System Operators}},
+  year    = {2026},
+  url     = {https://kufeoglu.github.io/distribution/},
+  note    = {Interactive web dashboard. ~147 countries.
+             Legal status, ownership, MV/LV voltages,
+             electrification rate, smart meter penetration,
+             SAIDI reliability, distributed RE share,
+             DSO/DNO/DISCOM terminology worldwide.
+             Global Power Systems Atlas, Vol. III.
+             Accessed: \url{https://kufeoglu.github.io/distribution/}}
+}</pre>
+    </div>
+  </div>
+</div>
+</section>
+
 <div class="map-tooltip" id="mapTooltip"></div>
 
 <script>
@@ -396,7 +595,7 @@ const DATA=[
 {country:"Switzerland",region:"Europe",isoId:756,numDSOs:630,company:"~680 DSOs; main: EWZ (Zurich), BKW Energie, Axpo Solutions, CKW, Energie Wasser Bern",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"16 / 10 kV",lvVolt:"400/230 V",customers:4.5,electRate:100,smartMeter:22,saidi:0.45,distRE:12,notes:"~680 DSOs mostly municipal-cantonal; excellent SAIDI ~27 min; slow smart meter: VESE voluntary vs mandatory elsewhere in EU; hydro+nuclear dominant; solar growing in Alpine+Jura."},
 {country:"T\u00fcrkiye",region:"Europe",isoId:792,numDSOs:21,company:"21 regional DISCOs: BEDA\u015e (Istanbul, largest, ENERJISA), AYEDA\u015e (Asian Istanbul), TEDA\u015e subsidiaries across Anatolia",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"34.5 / 10.5 kV",lvVolt:"400/230 V",customers:47.0,electRate:100,smartMeter:65,saidi:3.6,distRE:28,notes:"21 DISCOs after privatisation wave 2013\u201315; BEDA\u015e (Istanbul 11M customers) + AYEDA\u015e privatised to ENERJISA (Sabanc\u0131/E.ON); 65% smart meters 2025; YEKA auctions driving distributed RE."},
 {country:"Ukraine",region:"Europe",isoId:804,numDSOs:24,company:"24 regional oblenergos (oblastenergos); main: DTEK Dnipro, DTEK Kyiv, DTEK Odessa (private DTEK group) + state-owned oblenergo companies",status:"Unbundled",ownership:"Mixed",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:15.0,electRate:100,smartMeter:25,saidi:45.0,distRE:8,notes:"24 regional oblenergo DSOs; ~7 owned by DTEK (Akhmetov group); war damage: missile strikes on substations and lines severely increased SAIDI; emergency repairs ongoing 2024\u201325."},
-{country:"United Kingdom",region:"Europe",isoId:826,numDSOs:14,company:"14 licensed DNOs: UK Power Networks (SSE+EDF subsidiary), Western Power Distribution (National Grid), Electricity North West, Northern Powergrid, SP Distribution, SSEN, NIE Networks",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:33.0,electRate:100,smartMeter:62,saidi:0.75,distRE:50,notes:"14 licensed DNOs regulated by Ofgem under RIIO-ED2 (2023\u201328); NESO (state) is system operator but DNOs remain private; 62% smart meter penetration (slower than targets); massive EV+heat pump grid impact coming."},
+{country:"United Kingdom",region:"Europe",isoId:826,numDSOs:15,company:"14 DNO licences across 6 corporate groups (UK Power Networks 3, NGED 4, Northern Powergrid 2, ENWL 1, SP Energy Networks 2, SSEN Distribution 2) + NIE Networks (N. Ireland) + ~10 IDNO groups serving new build sites",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"33 / 11 kV",lvVolt:"400/230 V",customers:33.0,electRate:100,smartMeter:62,saidi:0.75,distRE:50,notes:"14 DNO licences in GB (6 corporate groups) regulated by Ofgem under RIIO-ED2 (2023\u201328); +NIE Networks for NI. NESO (state) operates transmission only. DNO\u2192DSO transformation underway for active flexibility procurement. 62% smart meter penetration (slower than targets); massive EV+heat pump grid impact coming. See dedicated DSO terminology section above."},
 {country:"Afghanistan",region:"Asia",isoId:4,numDSOs:4,company:"DABS regional offices (Kabul, North, West, South zones)",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"20 / 10 kV",lvVolt:"380/220 V",customers:1.2,electRate:97,smartMeter:2,saidi:4000.0,distRE:10,notes:"DABS operates distribution; high electrification rate due to mobile connectivity but only ~30% from national grid; imports from neighbours dominate; reliability extremely poor."},
 {country:"Armenia",region:"Asia",isoId:51,numDSOs:1,company:"Electric Networks of Armenia (ENA, TPAO/Inter RAO subsidiary)",status:"Unbundled",ownership:"Private",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"400/230 V",customers:1.0,electRate:100,smartMeter:60,saidi:3.2,distRE:8,notes:"ENA (Russian Inter RAO 100%) dominant; losses improved 38% \u2192 12%; 60% smart meters; Masrik-1 solar 55 MW feeding distribution."},
 {country:"Azerbaijan",region:"Asia",isoId:31,numDSOs:1,company:"Azerenerji Distribution + Bakcell subsidiaries",status:"Vertically Integrated",ownership:"Public",freq:"50 Hz",mvVolt:"10 / 6 kV",lvVolt:"380/220 V",customers:3.0,electRate:100,smartMeter:80,saidi:2.8,distRE:8,notes:"Azerenerji integrated; AMI rollout fast (80%); Baku grid modern; Nakhchivan separate and isolated; solar+wind feed distribution from 2024."},
@@ -658,6 +857,120 @@ function buildContTable(){
     <td class="num">${(worldTotal/worldCountries).toFixed(1)}</td>
     <td class="num" style="font-size:.63rem;color:var(--text2)">USA<br><span style="color:var(--amber);font-weight:700">2,938</span></td>
   </tr>`;
+  buildTermTable();
+}
+
+// ── DSO TERMINOLOGY MODEL TABLE ───────────────────────────────────────────────
+function buildTermTable(){
+  const MODELS=[
+    {
+      name:'DSO — Integrated',
+      acronym:'EU / ENTSO-E model',
+      def:'EU Electricity Directives 2009/2019. The Distribution System Operator owns and operates the MV/LV network. Legally separated from generation/supply (functional unbundling) but typically not from each other. CEER coordinates ~2,400 European DSOs.',
+      ents:'1 (France) to ~880 (Germany)',
+      duty:'<span class="duty-badge duty-both">Owner+Operator</span><span class="duty-badge duty-flex">Flex Procurement</span><span class="duty-badge duty-retail">Retail Separated</span>Wires and operations together; retail unbundled separately under EU rules.',
+      ownership:'Mostly large private utilities (Enedis, e-distribuzione, Iberdrola, Endesa, EDP), municipal Stadtwerke (Germany), or state-owned (Energinet, RTE for distribution affiliates).',
+      examples:'France (Enedis — single national DSO, 95% coverage) · Italy (e-distribuzione + ~120 minor) · Spain (5 majors + 350 small) · Netherlands (7 regional) · Sweden (~170) · Switzerland (~630, mostly municipal).'
+    },
+    {
+      name:'DNO + IDNO',
+      acronym:'UK model (transitioning to DSO)',
+      def:'14 licensed DNOs in 6 corporate groups in GB under Ofgem RIIO-ED2 (2023–28). Plus ~10 Independent DNOs (IDNOs) for new build sites. NIE Networks for Northern Ireland operates separately under Irish all-island grid.',
+      ents:'15 in UK + ~10 IDNO groups',
+      duty:'<span class="duty-badge duty-both">Owner+Operator</span><span class="duty-badge duty-flex">Active DSO Role</span>Wires + operations bundled. Retail fully separated since 1998. New: flexibility procurement, EV smart charging.',
+      ownership:'All private but international: Berkshire Hathaway (NPg), CKI/Hong Kong (UKPN), Iberdrola (SP), SSE plc (SSEN), National Grid (NGED ex-WPD), First Sentier+Equitix (ENWL). NIE Networks owned by ESB (Irish state).',
+      examples:'United Kingdom — see worked example above. RIIO-ED2 explicitly drives DNOs to develop "DSO" capabilities: data, monitoring, flexibility markets, DER integration.'
+    },
+    {
+      name:'IOU + Muni + Co-op + Federal',
+      acronym:'USA model — most fragmented in the world',
+      def:'EIA-861 census recognises 4 ownership types of distribution utilities: Investor-Owned (IOU), Municipal/Public Power (POU), Cooperative (Co-op), and Federal (TVA, BPA, WAPA). State PUCs regulate IOUs; federal regulator FERC handles wholesale.',
+      ents:'~3,000 in USA (largest count globally)',
+      duty:'<span class="duty-badge duty-both">Owner+Operator</span><span class="duty-badge duty-retail">+Retail (most states)</span>In ~36 vertically integrated states: same entity bills retail. In ~14 deregulated states: wires-only DSO + competitive retail suppliers.',
+      ownership:'~170 IOUs (PG&E, Duke, ConEd, Southern, Exelon, Xcel) — serve ~70% of customers. ~2,000 municipal POUs (LADWP largest, SMUD, Seattle City Light, NYPA). ~900 Co-ops (NRECA member). 9 Federal utilities (TVA biggest).',
+      examples:'USA. Industry trade groups: EEI (IOUs) · APPA (publics) · NRECA (co-ops). Largest DSO: PG&E (~5.5M customers). Smallest: tiny rural co-ops <500 customers.'
+    },
+    {
+      name:'DISCOM',
+      acronym:'India model',
+      def:'~70 state-government-owned distribution companies created by Electricity Act 2003 unbundling. State Electricity Regulatory Commissions (SERCs) approve tariffs. RDSS scheme (2021–26) funding 250M smart prepay meter rollout to fix AT&C losses.',
+      ents:'~70 state DISCOMs + 3 private (Tata, BSES Delhi, CESC)',
+      duty:'<span class="duty-badge duty-both">Owner+Operator</span><span class="duty-badge duty-retail">+Retail/Tariffs</span>Full bundled service: build wires, dispatch locally, bill consumers, set retail tariffs (subject to SERC approval).',
+      ownership:'Mostly state-government-owned (PSPCL Punjab, MSEDCL Maharashtra, BESCOM Karnataka, TNEB Tamil Nadu, etc.). Notable private exceptions in Delhi (BSES Yamuna/Rajdhani, Tata Power Delhi) and Kolkata (CESC).',
+      examples:'India — ~70 DISCOMs. Loss range: 10% (Tata Delhi, BESCOM) to 45% (UP, Bihar). Major reforms under UDAY 2015, Saubhagya 2017, RDSS 2021. Subsidies politicised; cross-subsidy from industry to agriculture.'
+    },
+    {
+      name:'DISCO',
+      acronym:'MENA / South Asia / Africa model',
+      def:'Common naming convention in Arab world, Pakistan, Nigeria for unbundled distribution companies created from former integrated utilities — with a national TSO above them. Often public; some privatised.',
+      ents:'8 (Egypt) to 39 (Iran)',
+      duty:'<span class="duty-badge duty-both">Owner+Operator</span><span class="duty-badge duty-retail">+Retail</span>Bundled wires + retail. Often subsidised tariffs creating financial fragility.',
+      ownership:'Mostly state-owned (Egypt 8 under MOEE, Iraq 18 under MOEE, Iran 39 under Tavanir, Pakistan 11 under WAPDA holding). Türkiye 21 — privatised 2013–15. Nigeria 11 — privatised 2013 but performance disappointing.',
+      examples:'Egypt (8 DISCOs: Cairo, Delta, Middle Egypt, Upper Egypt, Alexandria, Canal, East Delta, S.Cairo) · Pakistan (11: IESCO, LESCO, FESCO, GEPCO, MEPCO, PESCO, HESCO, SEPCO, QESCO, TESCO, K-Electric) · Nigeria (11 DISCOs post-PHCN unbundling) · Türkiye (21 privatised DISCOs).'
+    },
+    {
+      name:'DNSP',
+      acronym:'Australia model',
+      def:'Distribution Network Service Provider — registered with AEMO, regulated by AER under National Electricity Rules. 13 DNSPs in National Electricity Market (eastern grid) + Western Power in WEM.',
+      ents:'13 NEM + 1 WEM = 14',
+      duty:'<span class="duty-badge duty-both">Owner+Operator</span>Wires + operations bundled. Retail fully separate (competitive retail introduced 1998). AEMO does whole-of-system balancing.',
+      ownership:'Mix: state-owned (Energex, Ergon, Essential Energy, Endeavour, TasNetworks, Western Power), listed/private (AusNet — Brookfield, Powercor/CitiPower/United Energy — Spark Infrastructure/CKI, Ausgrid — IFM/AustralianSuper consortium, Jemena — SGCC), partial private (SA Power Networks — CKI+Spark).',
+      examples:'Australia — Ausgrid (1.7M, NSW largest), Energex (1.5M, QLD SE), Endeavour Energy (1M+, Western Sydney), AusNet (700K, Vic), Jemena (370K, Vic), Powercor, CitiPower, United Energy, SA Power Networks, Essential Energy (regional NSW), Ergon (regional QLD), TasNetworks, Western Power (WEM).'
+    },
+    {
+      name:'Concessionária de Distribuição',
+      acronym:'Brazil / Latin America model',
+      def:'Private concessions awarded by competitive auction (typically 30 years). ANEEL regulator approves tariffs every 4 years (revisão tarifária). Heavy private investment but strong national oversight.',
+      ents:'53 (Brazil), ~25 (Argentina), ~30 (Colombia)',
+      duty:'<span class="duty-badge duty-both">Owner+Operator</span><span class="duty-badge duty-retail">+Captive Retail</span>Wires + operations + retail to "captive" consumers <500 kW. Larger consumers can choose supplier.',
+      ownership:'Mostly private foreign-controlled: Enel (Italian — owns Enel Distribuição São Paulo, Rio, Ceará), EDP (Portuguese — owns ESP Santo, Rio Grande Sul), Equatorial Energia (BR-listed), Neoenergia (Iberdrola subsidiary), Energisa, CEMIG (state, MG), COPEL (state, PR).',
+      examples:'Brazil — 53 distribuidoras under ANEEL. Largest: Enel SP (8M consumers), CPFL Paulista (5M), Coelba/Neoenergia (6M). Argentina (Edenor, Edesur — privatised 1990s, now mostly state-influenced). Chile (Enel Distribución, CGE).'
+    },
+    {
+      name:'Stadtwerke + Big 4',
+      acronym:'Germany hybrid model',
+      def:'Unique German model: ~800 municipal Stadtwerke + 4 large regional DSOs (Bayernwerk Netz, Westnetz, Avacon, Mitnetz Strom) carved out of former Big 4 vertically-integrated utilities (RWE, E.ON, EnBW, Vattenfall) under EU unbundling.',
+      ents:'~880 total (Stadtwerke ~800 + Big 4 affiliates + a few others)',
+      duty:'<span class="duty-badge duty-both">Owner+Operator</span><span class="duty-badge duty-retail">Often +Retail+Heat+Water</span>Stadtwerke typically multi-utility: distribution + retail + district heating + water + sometimes generation + telecoms.',
+      ownership:'Stadtwerke = municipal (city/district government). Big 4 DSO affiliates: Bayernwerk (E.ON 100%), Westnetz (E.ON 100% post-Innogy), Avacon (E.ON), Mitnetz (envia Mitteldeutsche Energie/E.ON).',
+      examples:'Germany. Largest Stadtwerke: Stadtwerke München (SWM), Mainova (Frankfurt), Stadtwerke Köln, Stadtwerke Hannover (enercity), RheinEnergie (Köln). Federal regulator BNetzA + state regulators co-supervise.'
+    },
+    {
+      name:'Vertically Integrated Monopoly',
+      acronym:'Most of Sub-Saharan Africa, Middle East',
+      def:'Single state-owned utility owns and operates generation + transmission + distribution + retail under one roof. Common in countries that haven\'t completed power-sector reform.',
+      ents:'1 per country',
+      duty:'<span class="duty-badge duty-both">Owner+Operator</span><span class="duty-badge duty-retail">+Retail+Generation</span>Everything: generates, transmits, distributes, and bills end customers. May have informal cross-subsidies between segments.',
+      ownership:'Almost always state-owned ministry or SOE. Some private monopoly exceptions (JPS Jamaica — Marubeni, ENEO Cameroon — ACTIS).',
+      examples:'~70 countries: Eskom (RSA — distribution arm being separated 2024+), JIRAMA (Madagascar), TANESCO (Tanzania), ZESCO (Zambia), ESCOM (Malawi), NamPower (Namibia), Kahramaa (Qatar), MEW (Kuwait), GECOL (Libya), most Sub-Saharan and Middle Eastern utilities.'
+    },
+    {
+      name:'Mega-Utility / Single National',
+      acronym:'China / Korea / Indonesia model',
+      def:'Single (or two) huge state corporations cover entire national distribution network through regional subsidiaries. Massive scale efficiencies but limited competition or benchmarking.',
+      ents:'1 (Korea, Indonesia, Taiwan) or 2 (China)',
+      duty:'<span class="duty-badge duty-both">Owner+Operator</span><span class="duty-badge duty-retail">+Retail</span>End-to-end integrated. Tariffs centrally regulated by national government.',
+      ownership:'100% state SASAC (China — SGCC + CSG), state (KEPCO Korea — listed but state-controlled, PLN Indonesia — 100% state, Taipower Taiwan — 100% state).',
+      examples:'China (State Grid 26 provinces + Tibet, ~1.1 billion customers via provincial subsidiaries; CSG 5 southern provinces, ~250M). South Korea (KEPCO single utility). Indonesia (PLN — 22 regional distribution areas). Taiwan (Taipower).'
+    },
+    {
+      name:'LDC',
+      acronym:'Canada model',
+      def:'Local Distribution Companies provincially regulated. Ontario alone has ~60 LDCs after consolidation (down from ~300 pre-1998). Hydro One Networks dominates rural+wires. Other provinces have provincial monopoly distribution.',
+      ents:'~80 across Canada (~60 in Ontario, others provincial monopoly)',
+      duty:'<span class="duty-badge duty-both">Owner+Operator</span><span class="duty-badge duty-retail">+Retail</span>Bundled wires + retail in most provinces. Ontario partially deregulated retail since 2002.',
+      ownership:'Hydro One (Ontario — listed since 2015, Province majority shareholder). Toronto Hydro (city of Toronto). Hydro-Québec Distribution (state), BC Hydro (state), Manitoba Hydro (state), NB Power (state), SaskPower (state). All other provinces: provincial Crown corporation.',
+      examples:'Canada — Hydro One (Ontario rural+wires, 1.5M customers), Toronto Hydro (790K), Alectra Utilities (Hamilton+Mississauga, merger of 6 LDCs), Hydro-Québec Distribution (4.5M), BC Hydro (2M), Manitoba Hydro, Ontario\'s ~60 LDCs.'
+    }
+  ];
+  document.getElementById('termTableBody').innerHTML=MODELS.map(m=>`<tr>
+    <td class="model-name">${m.name}<span>${m.acronym}</span></td>
+    <td style="font-size:.63rem;line-height:1.5">${m.def}</td>
+    <td class="num" style="font-size:.7rem;line-height:1.3">${m.ents}</td>
+    <td class="duty">${m.duty}</td>
+    <td style="font-size:.62rem;line-height:1.5">${m.ownership}</td>
+    <td class="examples">${m.examples}</td>
+  </tr>`).join('');
 }
 
 // ── STATS CARDS ───────────────────────────────────────────────────────────────
@@ -900,6 +1213,18 @@ function showPanel(rec){
 function closePanel(){document.getElementById('countryPanel').classList.remove('open');}
 document.addEventListener('click',e=>{if(!e.target.closest('#countryPanel')&&!e.target.closest('#mapSvg'))closePanel();});
 
+// ── CITE ─────────────────────────────────────────────────────────────────────
+function copyCite(id,btnId){
+  const text=document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById(btnId);btn.textContent='Copied ✓';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2200);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    const btn=document.getElementById(btnId);btn.textContent='Copied ✓';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2200);
+  });
+}
 // ── INIT ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
   buildStats();buildRegional();buildContTable();buildCharts();render();buildMap();
