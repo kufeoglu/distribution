@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Global Distribution System Operators Dashboard</title>
+<title>Global Power Systems Atlas · Vol. III — Global Distribution System Operators</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
@@ -165,6 +165,21 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:4px;backgrou
 ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#c9bfa6;border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:var(--amber);}
 @media(max-width:1100px){.charts{grid-template-columns:1fr 1fr;}.charts .cc:last-child{grid-column:1/-1;}}
 @media(max-width:700px){.charts{grid-template-columns:1fr;}.charts .cc:last-child{grid-column:auto;}.hdr-title h1{font-size:1.7rem;}.country-panel{width:100%;}}
+/* HOW TO CITE */
+.cite-section{background:var(--card);border-top:2px solid var(--border);padding:22px 0 20px;}
+.cite-wrap{display:grid;grid-template-columns:auto 1fr 1fr;align-items:start;gap:24px;}
+.cite-eyebrow{display:flex;align-items:center;gap:10px;padding-right:24px;border-right:1px solid var(--border);}
+.cite-glyph{font-family:var(--fs);font-size:2rem;color:var(--amber);line-height:1;font-style:italic;}
+.cite-heading{font-family:var(--fm);font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);white-space:nowrap;margin-top:4px;}
+.cite-col{}
+.cite-col-label{font-family:var(--fm);font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:7px;display:flex;align-items:center;gap:8px;}
+.cite-formatted{font-family:var(--fb);font-size:.75rem;color:var(--text2);line-height:1.65;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px 14px;}
+.cite-formatted em{font-style:italic;color:var(--text);}
+.cite-bib{font-family:var(--fm);font-size:.65rem;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px 14px;white-space:pre;overflow-x:auto;line-height:1.7;margin:0;}
+.copy-btn{font-family:var(--fm);font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;background:var(--bg);border:1px solid var(--border);color:var(--text3);padding:2px 8px;border-radius:3px;cursor:pointer;transition:all .14s;}
+.copy-btn:hover{border-color:var(--bdhi);color:var(--amber);}
+.copy-btn.copied{background:rgba(42,122,78,.07);border-color:rgba(42,122,78,.3);color:var(--green);}
+@media(max-width:900px){.cite-wrap{grid-template-columns:1fr;}.cite-eyebrow{border-right:none;border-bottom:1px solid var(--border);padding-right:0;padding-bottom:14px;flex-direction:row;}.cite-glyph{font-size:1.6rem;}}
 </style>
 </head>
 <body>
@@ -172,6 +187,7 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:4px;backgrou
 <div class="container">
   <div class="hdr">
     <div class="hdr-title">
+      <div style="font-family:var(--fm);font-size:.52rem;color:var(--amber);letter-spacing:.2em;text-transform:uppercase;margin-bottom:5px;opacity:.85;">Global Power Systems Atlas &nbsp;·&nbsp; Vol. III</div>
       <h1><em style="font-style:italic;color:var(--amber)">⚡</em> Global Distribution System Operators</h1>
       <p>Legal status · Ownership · Frequency · MV/LV voltages · Customers · Electrification rate · Smart meters · SAIDI · Distributed RE · End-2025 · ~147 Countries</p>
     </div>
@@ -268,9 +284,59 @@ footer{border-top:1px solid var(--border);padding:14px 0;margin-top:4px;backgrou
 </div>
 </div>
 </footer>
+
+<!-- HOW TO CITE -->
+<section class="cite-section z1">
+<div class="container">
+  <div class="cite-wrap">
+    <div class="cite-eyebrow">
+      <div>
+        <div class="cite-glyph">❝</div>
+        <div class="cite-heading">How to<br>Cite</div>
+      </div>
+    </div>
+    <div class="cite-col">
+      <div class="cite-col-label">Formatted Citation</div>
+      <div class="cite-formatted">
+        Küfeoğlu, S. (2026). <em>Global Power Systems Atlas, Vol. III — Global Distribution System Operators</em> [Interactive web dashboard]. Retrieved from <span style="color:var(--amber)">https://kufeoglu.github.io/distribution/</span>
+      </div>
+      <div style="font-family:var(--fm);font-size:.52rem;color:var(--text4);margin-top:8px;letter-spacing:.06em;">
+        Also available on Google Scholar · DOI registered · Part of the Global Power Systems Atlas series
+      </div>
+    </div>
+    <div class="cite-col">
+      <div class="cite-col-label">BibTeX &nbsp;<button class="copy-btn" id="copyBtnDso" onclick="copyCite('bib-dso','copyBtnDso')">Copy</button></div>
+      <pre class="cite-bib" id="bib-dso">@misc{kufeoglu2026dso,
+  author  = {K{\"u}feo{\u{g}}lu, Sinan},
+  title   = {{Global Power Systems Atlas, Vol. III ---
+             Global Distribution System Operators}},
+  year    = {2026},
+  url     = {https://kufeoglu.github.io/distribution/},
+  note    = {Interactive web dashboard.
+             Global Power Systems Atlas, Vol. III.
+             Accessed: \url{https://kufeoglu.github.io/distribution/}}
+}</pre>
+    </div>
+  </div>
+</div>
+</section>
+
 <div class="map-tooltip" id="mapTooltip"></div>
 
 <script>
+// ── CITE COPY ────────────────────────────────────────────────────────────────
+function copyCite(id,btnId){
+  const text=document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById(btnId);
+    btn.textContent='Copied ✓';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2200);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    const btn=document.getElementById(btnId);btn.textContent='Copied ✓';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2200);
+  });
+}
 // ── DATA ─────────────────────────────────────────────────────────────────────
 const DATA=[
 {country:"Algeria",region:"Africa",isoId:12,numDSOs:5,company:"SDC (Sonelgaz Distribution Centre), five regional subsidiaries: SDC Alger, SDC Est, SDC Ouest, SDC Centre, SDC Sud",status:"Unbundled",ownership:"Public",freq:"50 Hz",mvVolt:"30 / 10 kV",lvVolt:"400/230 V",customers:5.2,electRate:99,smartMeter:8,saidi:15.0,distRE:3,notes:"5 regional SDC subsidiaries of Sonelgaz; legal unbundling 2002; smart meter pilot Algiers 2024; 30 kV rural MV backbone."},
